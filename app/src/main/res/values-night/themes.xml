@@ -2,13 +2,18 @@
 <resources>
     <style name="Theme.ExamPrepAI" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/primary_light</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimaryDark">#1E1B4B</item>
+        <item name="colorPrimaryContainer">#312E81</item>
+        <item name="colorOnPrimaryContainer">#E0E7FF</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorOnPrimary">@color/on_surface</item>
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorSurface">#1E1E1E</item>
-        <item name="colorOnSurface">#E0E0E0</item>
+        <item name="colorSurface">#1E293B</item>
+        <item name="colorOnSurface">#F1F5F9</item>
+        <item name="colorSurfaceVariant">#334155</item>
         <item name="colorError">@color/error</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:colorBackground">#0F172A</item>
+        <item name="android:statusBarColor">#0F172A</item>
+        <item name="android:navigationBarColor">#1E293B</item>
     </style>
 </resources>

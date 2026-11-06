@@ -12,12 +12,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 1. Prestigious Project Hero Card (Dark Oxford Navy Gradient) -->
+        <!-- 1. Vibrant Hero Card with Purple Gradient -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
             app:strokeWidth="0dp"
             app:cardBackgroundColor="@android:color/transparent">
 
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_hero_card"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -35,13 +35,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_accent_chip">
 
                         <ImageView
-                            android:layout_width="26dp"
-                            android:layout_height="26dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_academic_cap"
                             app:tint="@color/accent_dark"
@@ -52,7 +52,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
@@ -61,14 +61,14 @@
                             android:text="EXAM PREPARATION"
                             android:textSize="11sp"
                             android:textStyle="bold"
-                            android:letterSpacing="0.08"
-                            android:textColor="@color/accent_light" />
+                            android:letterSpacing="0.1"
+                            android:textColor="#E0E7FF" />
 
                         <TextView
                             android:id="@+id/text_project_title_large"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="22sp"
+                            android:textSize="24sp"
                             android:textStyle="bold"
                             android:textColor="#FFFFFF"
                             android:layout_marginTop="2dp" />
@@ -80,7 +80,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                    android:layout_marginTop="16dp">
 
                     <TextView
                         android:id="@+id/badge_language"
@@ -89,12 +89,12 @@
                         android:text="English"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:textColor="@color/on_primary_container"
-                        android:background="@drawable/bg_language_chip"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp" />
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/bg_chip_hero"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp" />
 
                     <TextView
                         android:id="@+id/badge_detail"
@@ -103,32 +103,32 @@
                         android:text="Standard Detail"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:textColor="@color/accent_dark"
-                        android:background="@drawable/bg_accent_chip"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/bg_chip_hero"
                         android:layout_marginStart="10dp"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp" />
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/text_project_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:lineSpacingExtra="3dp"
-                    android:textColor="#E2E8F0"
-                    android:layout_marginTop="12dp" />
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="#E0E7FF"
+                    android:layout_marginTop="14dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 2. Generated Study Guide Card (Shown when PDF exists) -->
+        <!-- 2. Generated Study Guide Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_latest_guide"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:visibility="gone"
             style="@style/Widget.ExamPrep.Card">
 
@@ -136,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -145,13 +145,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_language_chip">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_document_guide"
                             app:tint="@color/badge_guide_text"
@@ -162,14 +162,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Study Guide PDF Ready"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@color/on_surface" />
 
@@ -180,7 +180,7 @@
                             android:text="Generated study guide"
                             android:textSize="12sp"
                             android:textColor="@color/on_surface_light"
-                            android:layout_marginTop="2dp" />
+                            android:layout_marginTop="3dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -188,7 +188,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                    android:layout_marginTop="16dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_open_guide"
@@ -210,12 +210,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 3. Generated Exam Practice Card (Shown when Exam PDF / Quiz exists) -->
+        <!-- 3. Generated Exam Practice Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_latest_exam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:visibility="gone"
             style="@style/Widget.ExamPrep.Card">
 
@@ -223,7 +223,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -232,13 +232,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_language_chip">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_quiz_exam"
                             app:tint="@color/badge_exam_text"
@@ -249,7 +249,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
@@ -257,7 +257,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Exam Practice Test Ready"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@color/on_surface" />
 
@@ -268,7 +268,7 @@
                             android:text="Practice Questions Ready"
                             android:textSize="12sp"
                             android:textColor="@color/on_surface_light"
-                            android:layout_marginTop="2dp" />
+                            android:layout_marginTop="3dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -277,7 +277,7 @@
                     android:id="@+id/btn_start_practice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="16dp"
                     android:text="🎯 Launch Interactive Practice Mode"
                     style="@style/Widget.ExamPrep.Button.Accent" />
 
@@ -308,12 +308,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 4. Generated Presentation Card (Shown when PPTX exists) -->
+        <!-- 4. Generated Presentation Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_latest_slides"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:visibility="gone"
             style="@style/Widget.ExamPrep.Card">
 
@@ -321,7 +321,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -330,13 +330,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_accent_chip">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_presentation_deck"
                             app:tint="@color/badge_slides_text"
@@ -347,7 +347,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
@@ -355,7 +355,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Presentation Deck Ready"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@color/on_surface" />
 
@@ -366,7 +366,7 @@
                             android:text="PowerPoint (.pptx) • Widescreen 16:9"
                             android:textSize="12sp"
                             android:textColor="@color/on_surface_light"
-                            android:layout_marginTop="2dp" />
+                            android:layout_marginTop="3dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -374,7 +374,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                    android:layout_marginTop="16dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_open_slides"
@@ -396,12 +396,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 5. Generated Narrated Video Card (Shown when MP4 exists) -->
+        <!-- 5. Generated Narrated Video Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_latest_video"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:visibility="gone"
             style="@style/Widget.ExamPrep.Card">
 
@@ -409,7 +409,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -418,13 +418,13 @@
                     android:gravity="center_vertical">
 
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_language_chip">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_video_presentation"
                             app:tint="@color/badge_video_text"
@@ -435,7 +435,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
@@ -443,7 +443,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Narrated Video Ready"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@color/on_surface" />
 
@@ -454,7 +454,7 @@
                             android:text="720p HD Video • Synchronized TTS Narration"
                             android:textSize="12sp"
                             android:textColor="@color/on_surface_light"
-                            android:layout_marginTop="2dp" />
+                            android:layout_marginTop="3dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -462,7 +462,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                    android:layout_marginTop="16dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_play_video"
@@ -488,14 +488,14 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             style="@style/Widget.ExamPrep.Card">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -504,8 +504,8 @@
                     android:gravity="center_vertical">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:src="@drawable/ic_folder_materials"
                         app:tint="@color/primary"
                         android:contentDescription="Materials" />
@@ -514,9 +514,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="10dp"
                         android:text="Study Materials"
-                        android:textSize="17sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/on_surface" />
 
@@ -537,10 +537,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/empty_files"
                     android:textAlignment="center"
-                    android:lineSpacingExtra="3dp"
-                    android:padding="28dp"
+                    android:lineSpacingExtra="4dp"
+                    android:padding="32dp"
                     android:textColor="@color/on_surface_medium"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:visibility="visible" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -548,43 +548,57 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="12dp"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 7. Generation Studio Card -->
+        <!-- 7. AI Generation Studio Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
             style="@style/Widget.ExamPrep.Card">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="AI Generation Studio"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/on_surface" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✨"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" AI Generation Studio"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Generate structured study materials grounded strictly in your files"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textColor="@color/on_surface_light"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="14dp" />
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="16dp"
+                    android:lineSpacingExtra="2dp" />
 
-                <!-- 1. Generate Guide PDF (Hero Action) -->
+                <!-- 1. Generate Guide PDF -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_generate_guide"
                     android:layout_width="match_parent"
@@ -627,8 +641,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/divider"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="10dp" />
 
                 <!-- 5. Test AI Pipeline -->
                 <com.google.android.material.button.MaterialButton

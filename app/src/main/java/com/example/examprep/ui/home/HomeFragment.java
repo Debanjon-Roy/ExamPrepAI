@@ -42,10 +42,15 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         adapter = new ProjectAdapter(project -> {
-            Bundle args = new Bundle();
-            args.putLong("projectId", project.getId());
-            androidx.navigation.fragment.NavHostFragment.findNavController(HomeFragment.this)
-                    .navigate(R.id.action_home_to_project, args);
+            // Guard against double-tap or navigating when already on ProjectFragment
+            androidx.navigation.NavController navCtrl =
+                    androidx.navigation.fragment.NavHostFragment.findNavController(HomeFragment.this);
+            if (navCtrl.getCurrentDestination() != null
+                    && navCtrl.getCurrentDestination().getId() == R.id.homeFragment) {
+                Bundle args = new Bundle();
+                args.putLong("projectId", project.getId());
+                navCtrl.navigate(R.id.action_home_to_project, args);
+            }
         }, project -> {
             // Long click - delete
             new MaterialAlertDialogBuilder(requireContext())

@@ -18,54 +18,59 @@
         <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:navigationBarColor">@color/surface</item>
     </style>
-    
+
     <style name="Theme.ExamPrepAI.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- Premium Vintage Card Style -->
+    <!-- Modern Elevated Card Style -->
     <style name="Widget.ExamPrep.Card" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">2dp</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="strokeColor">@color/card_stroke</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">3dp</item>
+        <item name="strokeWidth">0dp</item>
         <item name="cardBackgroundColor">@color/surface</item>
     </style>
 
-    <!-- Vintage Primary Button -->
+    <!-- Primary Button with Gradient Feel -->
     <style name="Widget.ExamPrep.Button.Primary" parent="Widget.Material3.Button">
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">14dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/on_primary</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="elevation">2dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="elevation">4dp</item>
     </style>
 
-    <!-- Vintage Outlined Button -->
+    <!-- Modern Outlined Button -->
     <style name="Widget.ExamPrep.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="cornerRadius">12dp</item>
-        <item name="strokeColor">@color/primary</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="strokeColor">@color/primary_light</item>
         <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
     </style>
 
-    <!-- Warm Accent Button -->
+    <!-- Accent Button -->
     <style name="Widget.ExamPrep.Button.Accent" parent="Widget.Material3.Button">
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">14dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="backgroundTint">@color/accent</item>
         <item name="android:textColor">@color/on_primary</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="elevation">2dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="elevation">4dp</item>
+    </style>
+
+    <!-- FAB Shape Override -->
+    <style name="ShapeAppearanceOverlay.ExamPrep.Fab" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
     </style>
 </resources>
