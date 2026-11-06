@@ -308,120 +308,149 @@ public class ProjectFragment extends Fragment {
     }
 
     private void refreshLatestPdfCard() {
-        try {
-            currentPdfFile = generationManager.getLatestGeneratedPdf(projectId);
-            if (cardLatestGuide != null) {
-                if (currentPdfFile != null && currentPdfFile.exists()) {
-                    cardLatestGuide.setVisibility(View.VISIBLE);
-                    long sizeKb = currentPdfFile.length() / 1024;
-                    String dateStr = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(new Date(currentPdfFile.lastModified()));
-                    if (textGuideMeta != null) {
-                        textGuideMeta.setText(String.format("%s • %,d KB", dateStr, sizeKb));
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                File pdf = generationManager.getLatestGeneratedPdf(projectId);
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    currentPdfFile = pdf;
+                    if (cardLatestGuide != null) {
+                        if (currentPdfFile != null && currentPdfFile.exists()) {
+                            cardLatestGuide.setVisibility(View.VISIBLE);
+                            long sizeKb = currentPdfFile.length() / 1024;
+                            String dateStr = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(new Date(currentPdfFile.lastModified()));
+                            if (textGuideMeta != null) {
+                                textGuideMeta.setText(String.format("%s • %,d KB", dateStr, sizeKb));
+                            }
+                        } else {
+                            cardLatestGuide.setVisibility(View.GONE);
+                        }
                     }
-                } else {
-                    cardLatestGuide.setVisibility(View.GONE);
-                }
+                });
+            } catch (Exception e) {
+                android.util.Log.e("ProjectFragment", "Error refreshing PDF card", e);
             }
-        } catch (Exception e) {
-            android.util.Log.e("ProjectFragment", "Error refreshing PDF card", e);
-        }
+        });
     }
 
     private void refreshLatestExamCard() {
-        try {
-            currentExamPdfFile = generationManager.getLatestExamPdf(projectId);
-            currentExamQuiz = generationManager.getLatestExamQuiz(projectId);
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                File pdf = generationManager.getLatestExamPdf(projectId);
+                ExamQuiz quiz = generationManager.getLatestExamQuiz(projectId);
+                if (!isAdded()) return;
 
-            if (cardLatestExam == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    currentExamPdfFile = pdf;
+                    currentExamQuiz = quiz;
 
-            if (currentExamQuiz != null) {
-                cardLatestExam.setVisibility(View.VISIBLE);
-                if (textExamTitle != null) {
-                    if (currentExamQuiz.getExamTitle() != null && !currentExamQuiz.getExamTitle().isEmpty()) {
-                        textExamTitle.setText(currentExamQuiz.getExamTitle());
+                    if (cardLatestExam == null) return;
+
+                    if (currentExamQuiz != null) {
+                        cardLatestExam.setVisibility(View.VISIBLE);
+                        if (textExamTitle != null) {
+                            if (currentExamQuiz.getExamTitle() != null && !currentExamQuiz.getExamTitle().isEmpty()) {
+                                textExamTitle.setText(currentExamQuiz.getExamTitle());
+                            } else {
+                                textExamTitle.setText("Exam Practice Test Ready");
+                            }
+                        }
+
+                        int count = currentExamQuiz.getQuestions() != null ? currentExamQuiz.getQuestions().size() : 0;
+                        String diff = currentExamQuiz.getDifficulty() != null ? capitalize(currentExamQuiz.getDifficulty()) : "Mixed";
+                        String meta = count + " Questions • " + diff + " Difficulty";
+
+                        if (currentExamPdfFile != null && currentExamPdfFile.exists()) {
+                            long sizeKb = currentExamPdfFile.length() / 1024;
+                            meta += String.format(Locale.getDefault(), " • Printable PDF (%,d KB)", sizeKb);
+                        }
+                        if (textExamMeta != null) textExamMeta.setText(meta);
+                    } else if (currentExamPdfFile != null && currentExamPdfFile.exists()) {
+                        cardLatestExam.setVisibility(View.VISIBLE);
+                        if (textExamTitle != null) textExamTitle.setText("Exam Practice Paper Ready");
+                        long sizeKb = currentExamPdfFile.length() / 1024;
+                        if (textExamMeta != null) textExamMeta.setText(String.format(Locale.getDefault(), "Printable PDF (%,d KB)", sizeKb));
                     } else {
-                        textExamTitle.setText("Exam Practice Test Ready");
+                        cardLatestExam.setVisibility(View.GONE);
                     }
-                }
-
-                int count = currentExamQuiz.getQuestions() != null ? currentExamQuiz.getQuestions().size() : 0;
-                String diff = currentExamQuiz.getDifficulty() != null ? capitalize(currentExamQuiz.getDifficulty()) : "Mixed";
-                String meta = count + " Questions • " + diff + " Difficulty";
-
-                if (currentExamPdfFile != null && currentExamPdfFile.exists()) {
-                    long sizeKb = currentExamPdfFile.length() / 1024;
-                    meta += String.format(Locale.getDefault(), " • Printable PDF (%,d KB)", sizeKb);
-                }
-                if (textExamMeta != null) textExamMeta.setText(meta);
-            } else if (currentExamPdfFile != null && currentExamPdfFile.exists()) {
-                cardLatestExam.setVisibility(View.VISIBLE);
-                if (textExamTitle != null) textExamTitle.setText("Exam Practice Paper Ready");
-                long sizeKb = currentExamPdfFile.length() / 1024;
-                if (textExamMeta != null) textExamMeta.setText(String.format(Locale.getDefault(), "Printable PDF (%,d KB)", sizeKb));
-            } else {
-                cardLatestExam.setVisibility(View.GONE);
+                });
+            } catch (Exception e) {
+                android.util.Log.e("ProjectFragment", "Error refreshing Exam card", e);
             }
-        } catch (Exception e) {
-            android.util.Log.e("ProjectFragment", "Error refreshing Exam card", e);
-        }
+        });
     }
 
     private void refreshLatestSlidesCard() {
-        try {
-            currentPptxFile = generationManager.getLatestPresentationFile(projectId);
-            currentPresentationDeck = generationManager.getLatestPresentationDeck(projectId);
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                File pptx = generationManager.getLatestPresentationFile(projectId);
+                PresentationDeck deck = generationManager.getLatestPresentationDeck(projectId);
+                if (!isAdded()) return;
 
-            if (cardLatestSlides == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    currentPptxFile = pptx;
+                    currentPresentationDeck = deck;
 
-            if (currentPresentationDeck != null) {
-                cardLatestSlides.setVisibility(View.VISIBLE);
-                if (textSlidesTitle != null) {
-                    if (currentPresentationDeck.getPresentationTitle() != null && !currentPresentationDeck.getPresentationTitle().isEmpty()) {
-                        textSlidesTitle.setText(currentPresentationDeck.getPresentationTitle());
+                    if (cardLatestSlides == null) return;
+
+                    if (currentPresentationDeck != null) {
+                        cardLatestSlides.setVisibility(View.VISIBLE);
+                        if (textSlidesTitle != null) {
+                            if (currentPresentationDeck.getPresentationTitle() != null && !currentPresentationDeck.getPresentationTitle().isEmpty()) {
+                                textSlidesTitle.setText(currentPresentationDeck.getPresentationTitle());
+                            } else {
+                                textSlidesTitle.setText("Presentation Deck Ready");
+                            }
+                        }
+
+                        int count = currentPresentationDeck.getSlides() != null ? currentPresentationDeck.getSlides().size() : 0;
+                        String meta = count + " Slides • Widescreen 16:9 • Narration Script Included";
+
+                        if (currentPptxFile != null && currentPptxFile.exists()) {
+                            long sizeKb = currentPptxFile.length() / 1024;
+                            meta += String.format(Locale.getDefault(), " (%,d KB)", sizeKb);
+                        }
+                        if (textSlidesMeta != null) textSlidesMeta.setText(meta);
+                    } else if (currentPptxFile != null && currentPptxFile.exists()) {
+                        cardLatestSlides.setVisibility(View.VISIBLE);
+                        if (textSlidesTitle != null) textSlidesTitle.setText("Presentation Deck Ready");
+                        long sizeKb = currentPptxFile.length() / 1024;
+                        if (textSlidesMeta != null) textSlidesMeta.setText(String.format(Locale.getDefault(), "PowerPoint (.pptx) • %,d KB", sizeKb));
                     } else {
-                        textSlidesTitle.setText("Presentation Deck Ready");
+                        cardLatestSlides.setVisibility(View.GONE);
                     }
-                }
-
-                int count = currentPresentationDeck.getSlides() != null ? currentPresentationDeck.getSlides().size() : 0;
-                String meta = count + " Slides • Widescreen 16:9 • Narration Script Included";
-
-                if (currentPptxFile != null && currentPptxFile.exists()) {
-                    long sizeKb = currentPptxFile.length() / 1024;
-                    meta += String.format(Locale.getDefault(), " (%,d KB)", sizeKb);
-                }
-                if (textSlidesMeta != null) textSlidesMeta.setText(meta);
-            } else if (currentPptxFile != null && currentPptxFile.exists()) {
-                cardLatestSlides.setVisibility(View.VISIBLE);
-                if (textSlidesTitle != null) textSlidesTitle.setText("Presentation Deck Ready");
-                long sizeKb = currentPptxFile.length() / 1024;
-                if (textSlidesMeta != null) textSlidesMeta.setText(String.format(Locale.getDefault(), "PowerPoint (.pptx) • %,d KB", sizeKb));
-            } else {
-                cardLatestSlides.setVisibility(View.GONE);
+                });
+            } catch (Exception e) {
+                android.util.Log.e("ProjectFragment", "Error refreshing Slides card", e);
             }
-        } catch (Exception e) {
-            android.util.Log.e("ProjectFragment", "Error refreshing Slides card", e);
-        }
+        });
     }
 
     private void refreshLatestVideoCard() {
-        try {
-            currentVideoFile = generationManager.getLatestVideoFile(projectId);
-            if (cardLatestVideo == null) return;
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                File video = generationManager.getLatestVideoFile(projectId);
+                if (!isAdded()) return;
 
-            if (currentVideoFile != null && currentVideoFile.exists()) {
-                cardLatestVideo.setVisibility(View.VISIBLE);
-                long sizeMb = currentVideoFile.length() / (1024 * 1024);
-                if (sizeMb < 1) sizeMb = 1;
-                String dateStr = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(new Date(currentVideoFile.lastModified()));
-                if (textVideoTitle != null) textVideoTitle.setText("Narrated Video Ready");
-                if (textVideoMeta != null) textVideoMeta.setText(String.format(Locale.getDefault(), "%s • 720p HD MP4 (%,d MB)", dateStr, sizeMb));
-            } else {
-                cardLatestVideo.setVisibility(View.GONE);
+                requireActivity().runOnUiThread(() -> {
+                    currentVideoFile = video;
+                    if (cardLatestVideo == null) return;
+
+                    if (currentVideoFile != null && currentVideoFile.exists()) {
+                        cardLatestVideo.setVisibility(View.VISIBLE);
+                        long sizeMb = currentVideoFile.length() / (1024 * 1024);
+                        if (sizeMb < 1) sizeMb = 1;
+                        String dateStr = new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(new Date(currentVideoFile.lastModified()));
+                        if (textVideoTitle != null) textVideoTitle.setText("Narrated Video Ready");
+                        if (textVideoMeta != null) textVideoMeta.setText(String.format(Locale.getDefault(), "%s • 720p HD MP4 (%,d MB)", dateStr, sizeMb));
+                    } else {
+                        cardLatestVideo.setVisibility(View.GONE);
+                    }
+                });
+            } catch (Exception e) {
+                android.util.Log.e("ProjectFragment", "Error refreshing Video card", e);
             }
-        } catch (Exception e) {
-            android.util.Log.e("ProjectFragment", "Error refreshing Video card", e);
-        }
+        });
     }
 
     private void showGenerateQuestionsOptionsDialog() {

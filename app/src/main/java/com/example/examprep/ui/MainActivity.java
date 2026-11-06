@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Setup sidebar UI and adapter first before listeners fire
+        setupSidebar();
+
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         if (navHostFragment != null) {
@@ -82,11 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
             // Track active project in sidebar
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                if (destination.getId() == R.id.projectFragment && arguments != null) {
-                    long pid = arguments.getLong("projectId", -1);
-                    sidebarProjectAdapter.setActiveProjectId(pid);
-                } else {
-                    sidebarProjectAdapter.setActiveProjectId(-1);
+                if (sidebarProjectAdapter != null) {
+                    if (destination.getId() == R.id.projectFragment && arguments != null) {
+                        long pid = arguments.getLong("projectId", -1);
+                        sidebarProjectAdapter.setActiveProjectId(pid);
+                    } else {
+                        sidebarProjectAdapter.setActiveProjectId(-1);
+                    }
                 }
             });
         }
@@ -105,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setupSidebar();
         requestPermissions();
     }
 
