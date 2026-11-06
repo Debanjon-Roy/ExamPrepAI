@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="language_entries">
+        <item>English</item>
+        <item>বাংলা (Bengali)</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>bn</item>
+    </string-array>
+    <string-array name="detail_level_entries">
+        <item>Summary</item>
+        <item>Standard</item>
+        <item>Exhaustive</item>
+    </string-array>
+    <string-array name="detail_level_values">
+        <item>summary</item>
+        <item>standard</item>
+        <item>exhaustive</item>
+    </string-array>
+    <string-array name="question_type_entries">
+        <item>Multiple Choice (MCQ)</item>
+        <item>Short Answer</item>
+        <item>Essay</item>
+        <item>Mixed</item>
+    </string-array>
+    <string-array name="question_type_values">
+        <item>mcq</item>
+        <item>short_answer</item>
+        <item>essay</item>
+        <item>mixed</item>
+    </string-array>
+    <string-array name="difficulty_entries">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+        <item>Mixed</item>
+    </string-array>
+    <string-array name="difficulty_values">
+        <item>easy</item>
+        <item>medium</item>
+        <item>hard</item>
+        <item>mixed</item>
+    </string-array>
+</resources>

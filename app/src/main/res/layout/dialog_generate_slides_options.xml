@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Presentation Deck Generator"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Generate widescreen PowerPoint (.pptx) slides with structured outlines and lecture narration notes"
+            android:textSize="13sp"
+            android:textColor="@color/on_surface_light"
+            android:layout_marginTop="2dp" />
+
+        <!-- Detail / Length -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Presentation Length"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_slides_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_slides_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quick Summary Deck (~6 slides)"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_slides_standard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Standard Review Deck (~9 slides)"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_slides_exhaustive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Exhaustive Deep Dive (~14 slides)"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Language -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Language"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_slides_lang"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_slides_lang_en"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="English"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_slides_lang_bn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="বাংলা (Bengali)"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Features Info Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.ExamPrep.Card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✨ Deck Features Included"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Native 16:9 widescreen format (.pptx)\n• Vintage Blue custom academic styling\n• Structured bullet points &amp; key exam callout cards\n• Complete lecture narration script in speaker notes\n• Zero external bloat (opens in PowerPoint, Slides &amp; WPS)"
+                    android:textSize="11sp"
+                    android:textColor="@color/on_surface_medium"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

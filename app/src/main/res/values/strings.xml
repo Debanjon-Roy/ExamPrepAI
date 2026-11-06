@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ExamPrep AI</string>
+    <string name="title_home">Projects</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_project">Project</string>
+    
+    <!-- Settings -->
+    <string name="pref_api_key">api_key</string>
+    <string name="pref_daily_cap">daily_cap</string>
+    <string name="pref_language">language</string>
+    <string name="settings_api_key_title">Anthropic API Key</string>
+    <string name="settings_api_key_summary">Paste your Claude API key</string>
+    <string name="settings_daily_cap_title">Daily Spending Cap (USD)</string>
+    <string name="settings_daily_cap_summary">Stop AI requests when this amount is reached today</string>
+    <string name="settings_daily_cap_default">1.00</string>
+    <string name="settings_language_title">Default Language</string>
+    <string name="settings_language_summary">Language for generated content</string>
+    
+    <!-- Actions -->
+    <string name="action_new_project">New Project</string>
+    <string name="action_add_files">Add Files</string>
+    <string name="action_generate_guide">Generate Study Guide PDF</string>
+    <string name="action_generate_slides">Generate Slides</string>
+    <string name="action_generate_questions">Generate Exam Questions</string>
+    <string name="action_generate_video">Generate Video</string>
+    <string name="action_share">Share</string>
+    <string name="action_open">Open</string>
+    <string name="action_delete">Delete</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_new_project_title">New Project</string>
+    <string name="dialog_project_name_hint">Project name</string>
+    <string name="dialog_project_description_hint">Description (optional)</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_create">Create</string>
+    <string name="dialog_ok">OK</string>
+    
+    <!-- Errors -->
+    <string name="error_no_api_key">Please set your API key in Settings first</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_daily_cap_reached">Daily spending cap reached. Reset tomorrow or increase in Settings.</string>
+    <string name="error_rate_limit">Rate limited by API. Please wait and try again.</string>
+    <string name="error_file_unreadable">Could not read this file. It may be corrupted or in an unsupported format.</string>
+    <string name="error_no_files">Add some files to this project first</string>
+    <string name="error_no_text_extracted">Could not extract any text from the uploaded files</string>
+    
+    <!-- Status -->
+    <string name="status_extracting">Extracting text…</string>
+    <string name="status_generating">Generating…</string>
+    <string name="status_complete">Complete</string>
+    <string name="status_error">Error</string>
+    <string name="status_idle">Ready</string>
+    
+    <!-- Empty states -->
+    <string name="empty_projects">No projects yet.\nTap + to create one.</string>
+    <string name="empty_files">No files added.\nTap \"Add Files\" to import study materials.</string>
+    
+    <!-- Cost display -->
+    <string name="cost_display">Tokens: %1$d in / %2$d out • Cost: $%3$s</string>
+    <string name="daily_spent">Today\'s spending: $%1$s / $%2$s</string>
+    
+    <!-- File picker -->
+    <string name="pick_files">Choose files</string>
+    <string name="take_photo">Take photo</string>
+    
+    <!-- Languages -->
+    <string name="lang_english">English</string>
+    <string name="lang_bengali">বাংলা (Bengali)</string>
+</resources>

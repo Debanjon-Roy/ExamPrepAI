@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="API Configuration">
+
+        <EditTextPreference
+            android:key="api_key"
+            android:title="@string/settings_api_key_title"
+            android:summary="@string/settings_api_key_summary"
+            android:dialogTitle="Enter Anthropic API Key"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="validate_key"
+            android:title="Validate API Key"
+            android:summary="Check if the key format is valid"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="clear_key"
+            android:title="Clear API Key"
+            android:summary="Remove the stored API key"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Cost Control">
+
+        <EditTextPreference
+            android:key="daily_cap"
+            android:title="@string/settings_daily_cap_title"
+            android:summary="@string/settings_daily_cap_summary"
+            android:defaultValue="1.00"
+            android:dialogTitle="Set Daily Spending Cap (USD)"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="today_spending"
+            android:title="Today\'s Spending"
+            android:summary="$0.0000 / $1.00"
+            android:selectable="false"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Content">
+
+        <ListPreference
+            android:key="language"
+            android:title="@string/settings_language_title"
+            android:summary="@string/settings_language_summary"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:defaultValue="en"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

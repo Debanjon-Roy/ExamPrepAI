@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="database" path="." />
+    <exclude domain="database" path="androidx.work" />
+    <include domain="sharedpref" path="." />
+    <exclude domain="sharedpref" path="androidx.work_preferences.xml" />
+    <include domain="file" path="projects/" />
+    <include domain="file" path="generated/" />
+    <exclude domain="no_backup" path="." />
+    <exclude domain="cache" path="." />
+</full-backup-content>

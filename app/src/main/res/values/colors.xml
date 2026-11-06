@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Premium Vintage Academic Palette -->
+    <color name="primary">#1A365D</color>
+    <color name="primary_dark">#0F1D32</color>
+    <color name="primary_light">#2A4E7F</color>
+    <color name="primary_container">#E8F0FE</color>
+    <color name="on_primary_container">#0A2540</color>
+    
+    <!-- Warm Vintage Gold & Amber Accents -->
+    <color name="accent">#B45309</color>
+    <color name="accent_dark">#78350F</color>
+    <color name="accent_light">#FEF3C7</color>
+    
+    <!-- Surfaces & Backgrounds -->
+    <color name="background">#F1F5F9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#E2E8F0</color>
+    <color name="card_stroke">#CBD5E1</color>
+    
+    <!-- High-Contrast Typography (WCAG AAA Compliant) -->
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_surface">#0F172A</color>
+    <color name="on_surface_medium">#334155</color>
+    <color name="on_surface_light">#475569</color>
+    
+    <!-- Feedback & Status Colors -->
+    <color name="error">#991B1B</color>
+    <color name="error_light">#FEE2E2</color>
+    <color name="success">#065F46</color>
+    <color name="success_light">#D1FAE5</color>
+    <color name="warning">#92400E</color>
+    <color name="divider">#CBD5E1</color>
+    
+    <!-- Distinct Feature Badges -->
+    <color name="badge_guide_bg">#EFF6FF</color>
+    <color name="badge_guide_text">#1E40AF</color>
+    <color name="badge_exam_bg">#ECFDF5</color>
+    <color name="badge_exam_text">#065F46</color>
+    <color name="badge_slides_bg">#FFFBEB</color>
+    <color name="badge_slides_text">#92400E</color>
+    <color name="badge_video_bg">#F5F3FF</color>
+    <color name="badge_video_text">#5B21B6</color>
+</resources>

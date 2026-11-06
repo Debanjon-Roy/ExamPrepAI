@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Study Guide Options"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/on_surface" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configure coverage and output format"
+        android:textSize="13sp"
+        android:textColor="@color/on_surface_light"
+        android:layout_marginTop="2dp" />
+
+    <!-- Language Selector -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Output Language"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/on_surface"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:id="@+id/rg_language"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp">
+
+        <RadioButton
+            android:id="@+id/rb_lang_en"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="English"
+            android:checked="true"
+            android:textColor="@color/on_surface" />
+
+        <RadioButton
+            android:id="@+id/rb_lang_bn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="বাংলা (Bengali)"
+            android:textColor="@color/on_surface" />
+    </RadioGroup>
+
+    <!-- Detail Level Selector -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Detail Level"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/on_surface"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:id="@+id/rg_detail_level"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="6dp">
+
+        <RadioButton
+            android:id="@+id/rb_detail_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Summary (Quick revision cheat sheet)"
+            android:textColor="@color/on_surface" />
+
+        <RadioButton
+            android:id="@+id/rb_detail_standard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Standard (Balanced explanations &amp; key concepts)"
+            android:checked="true"
+            android:textColor="@color/on_surface" />
+
+        <RadioButton
+            android:id="@+id/rb_detail_exhaustive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exhaustive (Full chapter breakdowns &amp; details)"
+            android:textColor="@color/on_surface" />
+    </RadioGroup>
+
+    <!-- Verification Checkbox -->
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/cb_verify_completeness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Verify all source topics &amp; fill gaps (Recommended)"
+        android:checked="true"
+        android:textColor="@color/on_surface"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>

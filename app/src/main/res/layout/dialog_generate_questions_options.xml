@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exam Question Generator"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Custom practice tests generated from your materials"
+            android:textSize="13sp"
+            android:textColor="@color/on_surface_light"
+            android:layout_marginTop="2dp" />
+
+        <!-- Question Count -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Number of Questions"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_q_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_count_5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="5"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_count_10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="10"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_count_15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="15"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_count_20"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="20"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Question Type -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Question Type"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_q_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_type_mixed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mixed (MCQs, Short Answer &amp; Essay)"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_type_mcq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Multiple Choice Only (MCQ)"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_type_short"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Short Answer Conceptual Questions"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_type_essay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Essay &amp; Long Problems"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Difficulty -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Target Difficulty"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_q_difficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_diff_easy"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Easy"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_diff_medium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Medium"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_diff_hard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Hard"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_diff_mixed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mixed"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Language -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Language"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_q_lang"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_q_lang_en"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="English"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_q_lang_bn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="বাংলা (Bengali)"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

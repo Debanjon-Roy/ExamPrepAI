@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Narrated Video Studio"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Render 720p HD lecture slides with synchronized Text-to-Speech audio narration"
+            android:textSize="13sp"
+            android:textColor="@color/on_surface_light"
+            android:layout_marginTop="2dp" />
+
+        <!-- Detail / Length -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Video Length"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_video_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_video_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Concise Overview (~6 slides, ~2-3 mins)"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_video_standard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Standard Lecture (~9 slides, ~4-6 mins)"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_video_exhaustive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deep Dive Masterclass (~14 slides, ~8-12 mins)"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- Language -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Narration Language"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_video_lang"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rb_video_lang_en"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="English"
+                android:checked="true"
+                android:textColor="@color/on_surface" />
+
+            <RadioButton
+                android:id="@+id/rb_video_lang_bn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="বাংলা (Bengali)"
+                android:textColor="@color/on_surface" />
+        </RadioGroup>
+
+        <!-- TTS Voice Engine Status Banner -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_tts_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            style="@style/Widget.ExamPrep.Card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/text_tts_status_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔊 Checking TTS Voice Data..."
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/text_tts_status_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Verifying device Text-to-Speech voices..."
+                    android:textSize="11sp"
+                    android:textColor="@color/on_surface_medium"
+                    android:layout_marginTop="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_install_tts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Install Voices"
+                    android:visibility="gone"
+                    style="@style/Widget.Material3.Button.TonalButton" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Production Details -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ℹ️ Runs in the background via WorkManager. You can turn off your screen or use other apps while the video renders."
+            android:textSize="11sp"
+            android:textColor="@color/on_surface_light"
+            android:layout_marginTop="14dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
