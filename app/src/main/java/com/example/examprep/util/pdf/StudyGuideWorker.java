@@ -24,7 +24,7 @@ import com.example.examprep.data.model.ProjectFile;
 import com.example.examprep.ui.MainActivity;
 import com.example.examprep.util.ai.AiProvider;
 import com.example.examprep.util.ai.AiResponse;
-import com.example.examprep.util.ai.AnthropicClient;
+import com.example.examprep.util.ai.OpenAiClient;
 import com.example.examprep.util.ai.GenerationManager;
 import com.example.examprep.util.ai.HashUtils;
 import com.example.examprep.util.ai.JsonCleaner;
@@ -93,7 +93,7 @@ public class StudyGuideWorker extends Worker {
             return Result.failure();
         }
 
-        updateProgressNotification("Analyzing materials with Claude Haiku...", 30);
+        updateProgressNotification("Analyzing materials with ChatGPT (GPT-4o mini)...", 30);
 
         String langName = language.equals("bn") ? "Bengali (বাংলা)" : "English";
         String systemPrompt = "You are ExamPrep AI. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
@@ -107,7 +107,7 @@ public class StudyGuideWorker extends Worker {
 
         String userPrompt = "Generate the complete study guide JSON now based on all provided materials.";
 
-        AnthropicClient client = new AnthropicClient(getApplicationContext());
+        OpenAiClient client = new OpenAiClient(getApplicationContext());
         AtomicReference<String> guideJsonRef = new AtomicReference<>(null);
         AtomicReference<String> errorRef = new AtomicReference<>(null);
         CountDownLatch latch = new CountDownLatch(1);
@@ -172,7 +172,7 @@ public class StudyGuideWorker extends Worker {
         }
     }
 
-    private String runVerificationStep(AnthropicClient client, String materials, String existingJson, String langName) {
+    private String runVerificationStep(OpenAiClient client, String materials, String existingJson, String langName) {
         String verifySystem = "You are a quality-assurance verifier for study guides. Compare the generated study guide against the source materials. " +
                 "Find any topics, theorems, or definitions present in the source that were omitted. " +
                 "Return JSON: {\"gaps_found\": true/false, \"missing_sections\": [{\"heading\":\"...\",\"summary\":\"...\",\"key_concepts\":[],\"content_paragraphs\":[\"...\"],\"important_notes\":[]}]}";

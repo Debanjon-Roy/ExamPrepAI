@@ -30,7 +30,7 @@ import com.example.examprep.data.model.slide.SlideOutline;
 import com.example.examprep.ui.MainActivity;
 import com.example.examprep.util.ai.AiProvider;
 import com.example.examprep.util.ai.AiResponse;
-import com.example.examprep.util.ai.AnthropicClient;
+import com.example.examprep.util.ai.OpenAiClient;
 import com.example.examprep.util.ai.HashUtils;
 import com.example.examprep.util.ai.JsonCleaner;
 
@@ -82,7 +82,7 @@ public class VideoGenerationWorker extends Worker {
 
         try {
             // 1. Fetch or generate presentation slide outline
-            updateProgressNotification("Generating slide outline and narration scripts with Claude Haiku 5.5...", 15);
+            updateProgressNotification("Generating slide outline and narration scripts with ChatGPT...", 15);
             PresentationDeck deck = fetchOrGenerateDeck(projectId, project, language, detailLevel);
             if (deck == null || deck.getSlides().isEmpty()) {
                 return Result.failure();
@@ -194,7 +194,7 @@ public class VideoGenerationWorker extends Worker {
         }
 
         // Build deck with AI
-        AiProvider aiProvider = new AnthropicClient(getApplicationContext());
+        AiProvider aiProvider = new OpenAiClient(getApplicationContext());
         String langName = language.equals("bn") ? "Bengali (বাংলা)" : "English";
         int targetSlideCount = "summary".equals(detailLevel) ? 6 : ("exhaustive".equals(detailLevel) ? 14 : 9);
 

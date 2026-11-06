@@ -54,7 +54,7 @@ public class GenerationManager {
 
     public GenerationManager(@NonNull Context context) {
         this.context = context.getApplicationContext();
-        this.aiProvider = new AnthropicClient(context);
+        this.aiProvider = new OpenAiClient(context);
         this.database = ExamPrepApp.getInstance().getDatabase();
     }
 

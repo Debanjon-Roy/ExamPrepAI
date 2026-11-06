@@ -24,4 +24,10 @@ public interface GenerationCacheDao {
 
     @Query("DELETE FROM generation_cache WHERE projectId = :projectId")
     void deleteCacheForProject(long projectId);
+
+    @Query("SELECT COUNT(*) FROM generation_cache")
+    int getTotalWorksGenerated();
+
+    @Query("SELECT COUNT(*) FROM generation_cache")
+    androidx.lifecycle.LiveData<Integer> getTotalWorksGeneratedLive();
 }

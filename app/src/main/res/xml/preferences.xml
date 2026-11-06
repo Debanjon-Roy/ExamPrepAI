@@ -8,7 +8,7 @@
             android:key="api_key"
             android:title="@string/settings_api_key_title"
             android:summary="@string/settings_api_key_summary"
-            android:dialogTitle="Enter Anthropic API Key"
+            android:dialogTitle="Enter ChatGPT / OpenAI API Key"
             app:iconSpaceReserved="false" />
 
         <Preference

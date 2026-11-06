@@ -1000,7 +1000,7 @@ public class ProjectFragment extends Fragment {
         TextView jsonView = dialogView.findViewById(R.id.dialog_gen_json);
 
         title.setText("AI Pipeline Test");
-        status.setText("Initializing request to Claude Haiku 5.5...");
+        status.setText("Initializing request to ChatGPT (GPT-4o mini)...");
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
@@ -1066,7 +1066,7 @@ public class ProjectFragment extends Fragment {
                 @Override
                 public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
                     progressBar.setVisibility(View.GONE);
-                    status.setText("✓ Connection to Anthropic API successful!");
+                    status.setText("✓ Connection to ChatGPT / OpenAI API successful!");
                     resultsLayout.setVisibility(View.VISIBLE);
 
                     costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
@@ -1087,8 +1087,8 @@ public class ProjectFragment extends Fragment {
 
     private void showMissingApiKeyDialog() {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Anthropic API Key Required")
-                .setMessage("Please enter your Claude API key in Settings to use AI features.")
+                .setTitle("ChatGPT API Key Required")
+                .setMessage("Please enter your ChatGPT / OpenAI API key in Settings to use AI features.")
                 .setPositiveButton("Open Settings", (d, w) -> {
                     startActivity(new Intent(requireContext(), SettingsActivity.class));
                 })

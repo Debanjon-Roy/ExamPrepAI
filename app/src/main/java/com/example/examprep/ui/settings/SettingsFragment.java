@@ -96,10 +96,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     Toast.makeText(requireContext(), "No API key set", Toast.LENGTH_SHORT).show();
                 } else {
                     String key = securePrefs.getApiKey();
-                    if (key.startsWith("sk-ant-")) {
-                        Toast.makeText(requireContext(), "API key format looks valid", Toast.LENGTH_SHORT).show();
+                    if (key.startsWith("sk-")) {
+                        Toast.makeText(requireContext(), "API key format looks valid (starts with 'sk-')", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(requireContext(), "Warning: Key doesn't start with 'sk-ant-'. It may be invalid.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Warning: OpenAI keys typically start with 'sk-'. Please verify.", Toast.LENGTH_LONG).show();
                     }
                 }
                 return true;
@@ -126,7 +126,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 String masked = "••••••••" + key.substring(Math.max(0, key.length() - 4));
                 apiKeyPref.setSummary("Set: " + masked);
             } else {
-                apiKeyPref.setSummary("Not set — tap to enter your Anthropic API key");
+                apiKeyPref.setSummary("Not set — tap to enter your ChatGPT (OpenAI) API key");
             }
         }
     }

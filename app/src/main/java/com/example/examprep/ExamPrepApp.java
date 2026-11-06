@@ -13,6 +13,15 @@ public class ExamPrepApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+        // Apply saved theme preference
+        android.content.SharedPreferences themePrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isDark = themePrefs.getBoolean("pref_dark_theme", false);
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                isDark ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                       : androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        );
+
         PDFBoxResourceLoader.init(getApplicationContext());
         database = AppDatabase.getInstance(this);
     }

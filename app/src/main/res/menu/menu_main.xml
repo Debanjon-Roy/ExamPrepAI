@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/title_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_open_sidebar"
+        android:icon="@drawable/ic_menu_drawer"
+        android:title="Sidebar"
+        app:showAsAction="always" />
 </menu>

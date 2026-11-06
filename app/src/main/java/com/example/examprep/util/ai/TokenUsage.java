@@ -7,9 +7,10 @@ public class TokenUsage {
     private final long cacheReadInputTokens;
     private final double costUsd;
 
-    // Claude Haiku 5.5 pricing per million tokens
-    // Tier <= 100K: Input $0.10, Output $0.50, Cache Write $0.125, Cache Read $0.01
-    // Tier > 100K: Input $0.50, Output $2.50, Cache Write $0.625, Cache Read $0.05
+    // OpenAI GPT-4o mini pricing per million tokens:
+    // Input: $0.15 per 1M tokens
+    // Output: $0.60 per 1M tokens
+    // Cached prompt input: $0.075 per 1M tokens
     public TokenUsage(long inputTokens, long outputTokens,
                       long cacheCreationInputTokens, long cacheReadInputTokens) {
         this.inputTokens = inputTokens;
@@ -17,18 +18,14 @@ public class TokenUsage {
         this.cacheCreationInputTokens = cacheCreationInputTokens;
         this.cacheReadInputTokens = cacheReadInputTokens;
 
-        long totalInput = inputTokens + cacheCreationInputTokens + cacheReadInputTokens;
-        boolean isHighTier = totalInput > 100000;
+        double rateInput = 0.15;
+        double rateOutput = 0.60;
+        double rateCachedInput = 0.075;
 
-        double rateInput = isHighTier ? 0.50 : 0.10;
-        double rateOutput = isHighTier ? 2.50 : 0.50;
-        double rateCacheWrite = isHighTier ? 0.625 : 0.125;
-        double rateCacheRead = isHighTier ? 0.05 : 0.01;
-
-        double cost = (inputTokens * rateInput / 1_000_000.0)
+        long uncachedInput = Math.max(0, inputTokens - cacheReadInputTokens);
+        double cost = (uncachedInput * rateInput / 1_000_000.0)
                 + (outputTokens * rateOutput / 1_000_000.0)
-                + (cacheCreationInputTokens * rateCacheWrite / 1_000_000.0)
-                + (cacheReadInputTokens * rateCacheRead / 1_000_000.0);
+                + (cacheReadInputTokens * rateCachedInput / 1_000_000.0);
 
         this.costUsd = cost;
     }
@@ -59,8 +56,8 @@ public class TokenUsage {
 
     public String getFormattedSummary() {
         return String.format(
-                "Tokens: %d in / %d out (Cache: %d read, %d write) • Cost: $%.5f",
-                inputTokens, outputTokens, cacheReadInputTokens, cacheCreationInputTokens, costUsd
+                "Tokens: %d in / %d out (Cached: %d) • Cost: $%.5f",
+                inputTokens, outputTokens, cacheReadInputTokens, costUsd
         );
     }
 }

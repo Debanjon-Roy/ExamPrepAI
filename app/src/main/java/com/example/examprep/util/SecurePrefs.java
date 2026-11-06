@@ -16,7 +16,8 @@ public class SecurePrefs {
 
     private static final String TAG = "SecurePrefs";
     private static final String PREFS_FILE = "secure_prefs";
-    private static final String KEY_API_KEY = "anthropic_api_key";
+    private static final String KEY_API_KEY = "openai_api_key";
+    private static final String LEGACY_KEY_API_KEY = "anthropic_api_key";
     private static final String KEY_DAILY_CAP = "daily_spending_cap";
     private static final String KEY_DAILY_SPENT = "daily_spent";
     private static final String KEY_LAST_SPEND_DATE = "last_spend_date";
@@ -50,7 +51,11 @@ public class SecurePrefs {
     }
 
     public String getApiKey() {
-        return prefs.getString(KEY_API_KEY, null);
+        String key = prefs.getString(KEY_API_KEY, null);
+        if (key == null || key.trim().isEmpty()) {
+            key = prefs.getString(LEGACY_KEY_API_KEY, null);
+        }
+        return key;
     }
 
     public boolean hasApiKey() {
@@ -111,6 +116,6 @@ public class SecurePrefs {
     }
 
     public void clearApiKey() {
-        prefs.edit().remove(KEY_API_KEY).apply();
+        prefs.edit().remove(KEY_API_KEY).remove(LEGACY_KEY_API_KEY).apply();
     }
 }
