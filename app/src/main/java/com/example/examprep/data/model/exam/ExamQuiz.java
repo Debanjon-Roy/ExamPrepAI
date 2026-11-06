@@ -55,15 +55,11 @@ public class ExamQuiz implements Serializable {
                         JsonElement choices = qObj.has("options") ? qObj.get("options") : qObj.get("choices");
                         q.setOptions(parseOptions(choices));
 
-                        if (qObj.has("correct_answer")) {
-                            q.setCorrectAnswer(qObj.get("correct_answer").getAsString());
-                        } else if (qObj.has("answer")) {
-                            q.setCorrectAnswer(qObj.get("answer").getAsString());
-                        }
+                        q.setCorrectAnswer(readText(qObj, "correct_answer", "model_answer", "sample_answer", "answer", "correctAnswer"));
+                        String explanation = readText(qObj, "explanation", "reasoning");
+                        String rubric = readText(qObj, "rubric", "marking_scheme", "marking_criteria");
+                        q.setExplanation(explanation + (rubric.isEmpty() ? "" : "\n\nRubric:\n" + rubric));
 
-                        if (qObj.has("explanation")) {
-                            q.setExplanation(qObj.get("explanation").getAsString());
-                        }
                         if (qObj.has("source_topic")) {
                             q.setSourceTopic(qObj.get("source_topic").getAsString());
                         }
@@ -78,6 +74,23 @@ public class ExamQuiz implements Serializable {
         } catch (Exception ignored) {}
 
         return quiz;
+    }
+
+    private static String readText(JsonObject object, String... keys) {
+        for (String key : keys) {
+            JsonElement value = object.get(key);
+            if (value == null || value.isJsonNull()) continue;
+            if (value.isJsonPrimitive() && !value.getAsString().trim().isEmpty()) return value.getAsString();
+            if (value.isJsonArray()) {
+                List<String> lines = new ArrayList<>();
+                for (JsonElement item : value.getAsJsonArray()) {
+                    if (!item.isJsonNull()) lines.add(item.isJsonPrimitive() ? item.getAsString() : item.toString());
+                }
+                if (!lines.isEmpty()) return String.join("\n", lines);
+            }
+            if (value.isJsonObject()) return new Gson().toJson(value);
+        }
+        return "";
     }
 
     private static List<String> parseOptions(JsonElement value) {

@@ -125,6 +125,33 @@
                 android:visibility="gone"
                 android:layout_marginTop="12dp">
 
+                <EditText
+                    android:id="@+id/edit_practice_answer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="4"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:hint="Write your answer here"
+                    android:textColor="@color/on_surface"
+                    android:textColorHint="@color/on_surface_medium"
+                    android:importantForAutofill="no" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_check_answer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Check My Answer"
+                    style="@style/Widget.ExamPrep.Button.Primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="AI feedback uses your configured API key and may use credits. You can reveal the model answer for free."
+                    android:textSize="12sp"
+                    android:textColor="@color/on_surface_medium"
+                    android:layout_marginBottom="8dp" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_reveal_answer"
                     android:layout_width="match_parent"

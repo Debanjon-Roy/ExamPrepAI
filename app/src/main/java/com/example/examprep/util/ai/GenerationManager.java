@@ -357,6 +357,7 @@ public class GenerationManager {
                 "For every multiple-choice question use type 'mcq', include exactly four nonempty strings in 'options' " +
                 "labeled A. through D., and set 'correct_answer' to the correct letter. Never omit MCQ options. " +
                 "For written questions use type 'short_answer' or 'essay' with an empty options array. " +
+                "For written questions, correct_answer must contain the full model answer, never a letter or an empty value; explanation must include the marking rubric and key points. " +
                 "Output strictly JSON with this schema: " +
                 "{\"exam_title\":\"Exam Practice Test\",\"total_questions\":" + count + ",\"difficulty\":\"" + difficulty + "\",\"language\":\"" + language + "\"," +
                 "\"questions\":[{\"id\":1,\"type\":\"" + (type.equals("mixed") ? "mcq" : type) + "\",\"difficulty\":\"" + difficulty + "\",\"question\":\"Question text\"," +

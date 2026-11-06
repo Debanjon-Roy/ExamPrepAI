@@ -83,6 +83,8 @@ public class ExamQuestion implements Serializable {
     public boolean isMcq() {
         String normalized = getType().trim().toLowerCase(java.util.Locale.ROOT)
                 .replace('-', '_').replace(' ', '_');
+        if ("short".equals(normalized) || "short_answer".equals(normalized)
+                || "short_question".equals(normalized) || "essay".equals(normalized)) return false;
         return "mcq".equals(normalized) || "multiple_choice".equals(normalized)
                 || "multiple_choice_question".equals(normalized) || !getOptions().isEmpty();
     }
