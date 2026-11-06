@@ -28,6 +28,7 @@ public final class AuthManager {
 
     /** Signs out of Firebase AND clears the Google credential state, then runs onDone on the main thread. */
     public static void signOut(@NonNull Activity activity, @NonNull Runnable onDone) {
+        androidx.work.WorkManager.getInstance(activity).cancelAllWork();
         FirebaseAuth.getInstance().signOut();
 
         CredentialManager.create(activity).clearCredentialStateAsync(

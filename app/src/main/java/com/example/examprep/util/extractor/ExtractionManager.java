@@ -30,6 +30,7 @@ public class ExtractionManager {
 
     public static void extractFileAsync(@NonNull Context context, @NonNull ProjectFile projectFile,
                                         @NonNull ExtractionCallback callback) {
+        AppDatabase db = ExamPrepApp.getInstance().getDatabase();
         executor.execute(() -> {
             postProgress(callback, projectFile.getId(), "Extracting text...");
 
@@ -66,7 +67,6 @@ public class ExtractionManager {
             }
 
             // Update database
-            AppDatabase db = ExamPrepApp.getInstance().getDatabase();
             ProjectFileDao fileDao = db.projectFileDao();
 
             boolean success = result.isSuccess() && result.getText() != null && !result.getText().isEmpty();

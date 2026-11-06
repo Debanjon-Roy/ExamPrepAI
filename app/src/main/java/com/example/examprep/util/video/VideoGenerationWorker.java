@@ -53,6 +53,9 @@ public class VideoGenerationWorker extends Worker {
     public static final String KEY_DETAIL_LEVEL = "detail_level";
     public static final String KEY_OUTPUT_VIDEO_PATH = "output_video_path";
 
+    private String ownerUid;
+    private AppDatabase ownerDatabase;
+
     private static final String CHANNEL_ID = "examprep_video_generation_channel";
     private static final int NOTIFICATION_ID = 2002;
 
@@ -64,6 +67,9 @@ public class VideoGenerationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        ownerUid = getInputData().getString("owner_uid");
+        if (ownerUid == null || !ownerUid.equals(UserPaths.currentUid())) return Result.failure();
+        ownerDatabase = AppDatabase.getInstance(getApplicationContext(), ownerUid);
         long projectId = getInputData().getLong(KEY_PROJECT_ID, -1);
         String language = getInputData().getString(KEY_LANGUAGE);
         if (language == null) language = "en";
@@ -76,7 +82,7 @@ public class VideoGenerationWorker extends Worker {
 
         updateProgressNotification("Initializing video production studio...", 5);
 
-        AppDatabase db = ExamPrepApp.getInstance().getDatabase();
+        AppDatabase db = ownerDatabase;
         Project project = db.projectDao().getProjectByIdSync(projectId);
         if (project == null) {
             return Result.failure();
@@ -154,7 +160,7 @@ public class VideoGenerationWorker extends Worker {
             mainHandler.post(tts::shutdown);
 
             // 4. Encode Slideshow to MP4 using Hardware MediaCodec + MediaMuxer
-            File outputDir = new File(UserPaths.filesDir(getApplicationContext()), "generated/" + projectId);
+            File outputDir = new File(UserPaths.filesDir(getApplicationContext(), ownerUid), "generated/" + projectId);
             if (!outputDir.exists()) outputDir.mkdirs();
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
@@ -189,7 +195,7 @@ public class VideoGenerationWorker extends Worker {
     }
 
     private PresentationDeck fetchOrGenerateDeck(long projectId, Project project, String language, String detailLevel) throws Exception {
-        AppDatabase db = ExamPrepApp.getInstance().getDatabase();
+        AppDatabase db = ownerDatabase;
         GenerationCache cached = db.generationCacheDao().getLatestCachedResult(projectId, "presentation_outline");
         if (cached != null && cached.getResultJson() != null) {
             return PresentationDeck.fromJson(cached.getResultJson());

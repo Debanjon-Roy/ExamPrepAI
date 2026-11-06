@@ -51,11 +51,13 @@ public class GenerationManager {
     private final Context context;
     private final AiProvider aiProvider;
     private final AppDatabase database;
+    private final java.io.File ownerFilesDir;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public GenerationManager(@NonNull Context context) {
         this.context = context.getApplicationContext();
+        this.ownerFilesDir = UserPaths.filesDir(context);
         this.aiProvider = new OpenAiClient(context);
         this.database = ExamPrepApp.getInstance().getDatabase();
     }
@@ -173,7 +175,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestGeneratedPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -237,7 +239,7 @@ public class GenerationManager {
                                 projectId,
                                 projectName,
                                 finalJson,
-                                language
+                                language, ownerFilesDir
                         );
 
                         mainHandler.post(() -> callback.onSuccess(pdfFile, usage, fromCache));
@@ -315,7 +317,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestExamPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -378,7 +380,7 @@ public class GenerationManager {
                                 context,
                                 projectId,
                                 projectName,
-                                quiz
+                                quiz, ownerFilesDir
                         );
 
                         mainHandler.post(() -> callback.onSuccess(quiz, pdfFile, usage, fromCache));
@@ -396,7 +398,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestPresentationFile(long projectId) {
-        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -414,7 +416,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestVideoFile(long projectId) {
-        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -484,7 +486,7 @@ public class GenerationManager {
                                 context,
                                 projectId,
                                 projectName,
-                                deck
+                                deck, ownerFilesDir
                         );
 
                         mainHandler.post(() -> callback.onSuccess(deck, pptxFile, usage, fromCache));

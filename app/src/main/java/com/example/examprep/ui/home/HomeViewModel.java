@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 
 public class HomeViewModel extends AndroidViewModel {
 
+    private final String ownerUid = com.example.examprep.util.UserPaths.currentUid();
     private final ProjectDao projectDao;
     private final LiveData<List<Project>> allProjects;
 
@@ -41,14 +42,14 @@ public class HomeViewModel extends AndroidViewModel {
             }
             long id = projectDao.insert(project);
             project.setId(id);
-            CloudSync.pushProject(project);
+            CloudSync.pushProject(ownerUid, project);
         });
     }
 
     public void deleteProject(Project project) {
         Executors.newSingleThreadExecutor().execute(() -> {
             projectDao.delete(project);
-            CloudSync.deleteProject(project.getId());
+            CloudSync.deleteProject(ownerUid, project.getId());
         });
     }
 }

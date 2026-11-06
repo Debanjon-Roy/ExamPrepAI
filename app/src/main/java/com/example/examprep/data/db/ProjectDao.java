@@ -36,6 +36,9 @@ public interface ProjectDao {
     @Query("SELECT * FROM projects WHERE id = :id")
     Project getProjectByIdSync(long id);
 
+    @Query("SELECT * FROM projects")
+    List<Project> getAllProjectsSync();
+
     @Query("SELECT COUNT(*) FROM projects")
     int getProjectCount();
 

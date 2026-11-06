@@ -49,8 +49,18 @@ public class ExamPdfGenerator {
             @NonNull String projectName,
             @NonNull ExamQuiz quiz
     ) throws Exception {
+        return generateExamPdf(context, projectId, projectName, quiz, UserPaths.filesDir(context));
+    }
 
-        File outputDir = new File(UserPaths.filesDir(context), "generated/" + projectId);
+    public static File generateExamPdf(
+            @NonNull Context context,
+            long projectId,
+            @NonNull String projectName,
+            @NonNull ExamQuiz quiz,
+            @NonNull File ownerFilesDir
+    ) throws Exception {
+
+        File outputDir = new File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }

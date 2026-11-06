@@ -990,6 +990,7 @@ public class ProjectFragment extends Fragment {
 
     private void startVideoGeneration(String language, String detailLevel) {
         Data inputData = new Data.Builder()
+                .putString("owner_uid", com.example.examprep.util.UserPaths.currentUid())
                 .putLong(VideoGenerationWorker.KEY_PROJECT_ID, projectId)
                 .putString(VideoGenerationWorker.KEY_LANGUAGE, language)
                 .putString(VideoGenerationWorker.KEY_DETAIL_LEVEL, detailLevel)

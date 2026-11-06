@@ -37,6 +37,8 @@ public class ProjectViewModel extends AndroidViewModel {
     private final LiveData<Project> project;
     private final LiveData<List<ProjectFile>> files;
     private final long projectId;
+    private final String ownerUid = UserPaths.currentUid();
+    private final File ownerFilesDir;
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
 
     private final MutableLiveData<String> statusMessage = new MutableLiveData<>();
@@ -44,6 +46,7 @@ public class ProjectViewModel extends AndroidViewModel {
     public ProjectViewModel(@NonNull Application application, long projectId) {
         super(application);
         this.projectId = projectId;
+        ownerFilesDir = UserPaths.filesDir(application);
         projectDao = ((ExamPrepApp) application).getDatabase().projectDao();
         fileDao = ((ExamPrepApp) application).getDatabase().projectFileDao();
         project = projectDao.getProjectLive(projectId);
@@ -98,6 +101,7 @@ public class ProjectViewModel extends AndroidViewModel {
 
             // Update project timestamp
             projectDao.updateTimestamp(projectId, new Date());
+            com.example.examprep.data.cloud.CloudSync.pushProject(ownerUid, projectDao.getProjectByIdSync(projectId));
 
             // Run OCR
             runExtraction(projectFile);
@@ -134,7 +138,7 @@ public class ProjectViewModel extends AndroidViewModel {
         }
 
         // Copy file to project folder
-        File projectDir = new File(UserPaths.filesDir(getApplication()), "projects/" + projectId);
+        File projectDir = new File(ownerFilesDir, "projects/" + projectId);
         if (!projectDir.exists()) {
             projectDir.mkdirs();
         }
@@ -166,6 +170,7 @@ public class ProjectViewModel extends AndroidViewModel {
         projectFile.setId(id);
 
         projectDao.updateTimestamp(projectId, new Date());
+            com.example.examprep.data.cloud.CloudSync.pushProject(ownerUid, projectDao.getProjectByIdSync(projectId));
 
         runExtraction(projectFile);
     }

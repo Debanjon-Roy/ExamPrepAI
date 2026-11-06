@@ -282,15 +282,18 @@ public class MainActivity extends AppCompatActivity {
                         String desc = descInput.getText().toString().trim();
                         String lang = (rbBn != null && rbBn.isChecked()) ? "bn" : "en";
 
+                        String ownerUid = UserPaths.currentUid();
+                        com.example.examprep.data.db.ProjectDao ownerDao = ExamPrepApp.getInstance().getDatabase().projectDao();
                         Executors.newSingleThreadExecutor().execute(() -> {
                             Project project = new Project(name);
                             if (!desc.isEmpty()) project.setDescription(desc);
                             project.setLanguage(lang);
-                            long id = ExamPrepApp.getInstance().getDatabase().projectDao().insert(project);
+                            long id = ownerDao.insert(project);
                             project.setId(id);
-                            CloudSync.pushProject(project);
+                            CloudSync.pushProject(ownerUid, project);
 
                             runOnUiThread(() -> {
+                                if (!ownerUid.equals(UserPaths.currentUid()) || isFinishing()) return;
                                 Bundle args = new Bundle();
                                 args.putLong("projectId", id);
                                 navController.navigate(R.id.action_global_project, args);

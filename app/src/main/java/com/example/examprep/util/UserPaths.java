@@ -27,7 +27,11 @@ public final class UserPaths {
 
     /** filesDir/users/<uid>/  (contains projects/ and generated/) */
     public static File filesDir(Context context) {
-        File dir = new File(context.getApplicationContext().getFilesDir(), "users/" + currentUid());
+        return filesDir(context, currentUid());
+    }
+
+    public static File filesDir(Context context, String uid) {
+        File dir = new File(context.getApplicationContext().getFilesDir(), "users/" + uid);
         if (!dir.exists()) dir.mkdirs();
         return dir;
     }

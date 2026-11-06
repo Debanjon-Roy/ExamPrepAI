@@ -36,6 +36,8 @@ public class Project {
      * Primary constructor with name only. Sets all defaults.
      */
     public Project(@NonNull String name) {
+        this.id = java.util.UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+        if (this.id == 0) this.id = 1;
         this.name = name;
         this.description = null;
         this.createdAt = new Date();

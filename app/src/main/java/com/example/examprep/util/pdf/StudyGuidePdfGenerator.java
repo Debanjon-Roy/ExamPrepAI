@@ -52,8 +52,19 @@ public class StudyGuidePdfGenerator {
             @NonNull String studyGuideJson,
             @NonNull String language
     ) throws Exception {
+        return generatePdf(context, projectId, projectName, studyGuideJson, language, UserPaths.filesDir(context));
+    }
 
-        File outputDir = new File(UserPaths.filesDir(context), "generated/" + projectId);
+    public static File generatePdf(
+            @NonNull Context context,
+            long projectId,
+            @NonNull String projectName,
+            @NonNull String studyGuideJson,
+            @NonNull String language,
+            @NonNull File ownerFilesDir
+    ) throws Exception {
+
+        File outputDir = new File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }

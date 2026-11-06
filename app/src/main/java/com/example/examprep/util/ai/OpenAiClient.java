@@ -39,12 +39,14 @@ public class OpenAiClient implements AiProvider {
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     private final SecurePrefs securePrefs;
+    private final AppDatabase ownerDatabase;
     private final OkHttpClient httpClient;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Gson gson = new Gson();
 
     public OpenAiClient(@NonNull Context context) {
         this.securePrefs = new SecurePrefs(context);
+        this.ownerDatabase = ExamPrepApp.getInstance().getDatabase();
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(100, TimeUnit.SECONDS)
@@ -348,7 +350,7 @@ public class OpenAiClient implements AiProvider {
         new Thread(() -> {
             try {
                 String today = LocalDate.now().toString();
-                AppDatabase db = ExamPrepApp.getInstance().getDatabase();
+                AppDatabase db = ownerDatabase;
                 CostRecord existing = db.costRecordDao().getCostRecordForDate(today);
 
                 if (existing == null) {

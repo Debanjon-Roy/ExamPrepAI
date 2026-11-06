@@ -21,8 +21,7 @@ import com.example.examprep.util.UserPaths;
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static AppDatabase INSTANCE;
-    private static String instanceUid;
+    private static final java.util.Map<String, AppDatabase> INSTANCES = new java.util.HashMap<>();
 
     public abstract ProjectDao projectDao();
 
@@ -41,22 +40,23 @@ public abstract class AppDatabase extends RoomDatabase {
      * If the account changed since the last call, a different database file is opened.
      */
     public static synchronized AppDatabase getInstance(Context context) {
+        return getInstance(context, UserPaths.currentUid());
+    }
+
+    public static synchronized AppDatabase getInstance(Context context, String uid) {
         Context app = context.getApplicationContext();
-        String uid = UserPaths.currentUid();
 
-        if (INSTANCE == null || !uid.equals(instanceUid)) {
-            boolean adoptedLegacy = LegacyMigration.claim(app, uid);
+        AppDatabase database = INSTANCES.get(uid);
+        if (database == null) {
+            // Legacy data has no reliable owner; never assign it on login.
 
-            INSTANCE = Room.databaseBuilder(app, AppDatabase.class, dbNameFor(uid))
+            database = Room.databaseBuilder(app, AppDatabase.class, dbNameFor(uid))
                     .allowMainThreadQueries()
                     .fallbackToDestructiveMigration()
                     .build();
-            instanceUid = uid;
+            INSTANCES.put(uid, database);
 
-            if (adoptedLegacy) {
-                LegacyMigration.fixFilePaths(app, INSTANCE);
-            }
         }
-        return INSTANCE;
+        return database;
     }
 }

@@ -44,7 +44,17 @@ public class PptxGenerator {
             @NonNull String projectName,
             @NonNull PresentationDeck deck
     ) throws IOException {
-        File outputDir = new File(UserPaths.filesDir(context), "generated/" + projectId);
+        return generatePresentation(context, projectId, projectName, deck, UserPaths.filesDir(context));
+    }
+
+    public static File generatePresentation(
+            @NonNull Context context,
+            long projectId,
+            @NonNull String projectName,
+            @NonNull PresentationDeck deck,
+            @NonNull File ownerFilesDir
+    ) throws IOException {
+        File outputDir = new File(ownerFilesDir, "generated/" + projectId);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
