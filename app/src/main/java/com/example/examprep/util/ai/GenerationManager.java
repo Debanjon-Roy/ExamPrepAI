@@ -97,7 +97,7 @@ public class GenerationManager {
             }
 
             // 2. Check local Room cache
-            String cacheKeyData = fullMaterials + "\n" + generationType + "\n" + userPrompt + "\n" + project.getLanguage();
+            String cacheKeyData = fullMaterials + "\n" + generationType + "\n" + systemInstruction + "\n" + userPrompt + "\n" + project.getLanguage();
             String inputHash = HashUtils.sha256(cacheKeyData);
 
             GenerationCacheDao cacheDao = database.generationCacheDao();
@@ -354,6 +354,9 @@ public class GenerationManager {
         String systemInstruction = "You are an expert university examiner. Generate realistic exam practice questions strictly based on the uploaded materials. " +
                 "Language must be " + langName + ". Target difficulty: " + difficulty + ". Target type: " + type + ". " +
                 "Include step-by-step reasoning explaining why the correct answer is right and why others are wrong under 'explanation'. " +
+                "For every multiple-choice question use type 'mcq', include exactly four nonempty strings in 'options' " +
+                "labeled A. through D., and set 'correct_answer' to the correct letter. Never omit MCQ options. " +
+                "For written questions use type 'short_answer' or 'essay' with an empty options array. " +
                 "Output strictly JSON with this schema: " +
                 "{\"exam_title\":\"Exam Practice Test\",\"total_questions\":" + count + ",\"difficulty\":\"" + difficulty + "\",\"language\":\"" + language + "\"," +
                 "\"questions\":[{\"id\":1,\"type\":\"" + (type.equals("mixed") ? "mcq" : type) + "\",\"difficulty\":\"" + difficulty + "\",\"question\":\"Question text\"," +
@@ -373,6 +376,13 @@ public class GenerationManager {
                     mainHandler.post(() -> callback.onProgress("Rendering printable exam paper & solution key with iText 7..."));
                     try {
                         com.example.examprep.data.model.exam.ExamQuiz quiz = com.example.examprep.data.model.exam.ExamQuiz.fromJson(resultJson);
+                        for (com.example.examprep.data.model.exam.ExamQuestion question : quiz.getQuestions()) {
+                            if (question.isMcq() && question.getOptions().size() < 2) {
+                                database.generationCacheDao().deleteCacheByType(projectId, "exam_questions");
+                                throw new IllegalArgumentException("Question " + question.getId()
+                                        + " is missing its answer choices. Generate a new exam to try again.");
+                            }
+                        }
                         Project project = database.projectDao().getProjectByIdSync(projectId);
                         String projectName = project != null ? project.getName() : "Practice Exam";
 

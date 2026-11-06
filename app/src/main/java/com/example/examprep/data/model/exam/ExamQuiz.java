@@ -52,13 +52,8 @@ public class ExamQuiz implements Serializable {
                         q.setDifficulty(qObj.has("difficulty") ? qObj.get("difficulty").getAsString() : "medium");
                         q.setQuestion(qObj.has("question") ? qObj.get("question").getAsString() : "");
 
-                        if (qObj.has("options") && qObj.get("options").isJsonArray()) {
-                            List<String> opts = new ArrayList<>();
-                            for (JsonElement oElem : qObj.getAsJsonArray("options")) {
-                                opts.add(oElem.getAsString());
-                            }
-                            q.setOptions(opts);
-                        }
+                        JsonElement choices = qObj.has("options") ? qObj.get("options") : qObj.get("choices");
+                        q.setOptions(parseOptions(choices));
 
                         if (qObj.has("correct_answer")) {
                             q.setCorrectAnswer(qObj.get("correct_answer").getAsString());
@@ -83,6 +78,35 @@ public class ExamQuiz implements Serializable {
         } catch (Exception ignored) {}
 
         return quiz;
+    }
+
+    private static List<String> parseOptions(JsonElement value) {
+        List<String> options = new ArrayList<>();
+        if (value == null || value.isJsonNull()) return options;
+        if (value.isJsonArray()) {
+            for (JsonElement item : value.getAsJsonArray()) {
+                if (item.isJsonPrimitive()) {
+                    options.add(item.getAsString());
+                } else if (item.isJsonObject()) {
+                    JsonObject object = item.getAsJsonObject();
+                    JsonElement text = object.has("text") ? object.get("text") : object.get("value");
+                    JsonElement label = object.has("label") ? object.get("label") : object.get("id");
+                    if (text != null && text.isJsonPrimitive()) {
+                        options.add(label != null && label.isJsonPrimitive()
+                                ? label.getAsString() + ". " + text.getAsString() : text.getAsString());
+                    }
+                }
+            }
+        } else if (value.isJsonObject()) {
+            // Labeled maps may arrive in any JSON property order; preserve A/B/C/D order.
+            java.util.Map<String, JsonElement> sorted = new java.util.TreeMap<>(value.getAsJsonObject().asMap());
+            for (java.util.Map.Entry<String, JsonElement> entry : sorted.entrySet()) {
+                if (entry.getValue().isJsonPrimitive()) {
+                    options.add(entry.getKey() + ". " + entry.getValue().getAsString());
+                }
+            }
+        }
+        return options;
     }
 
     public String getExamTitle() {

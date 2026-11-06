@@ -140,6 +140,9 @@ public class ExamPracticeActivity extends AppCompatActivity {
         } else {
             layoutMcq.setVisibility(View.GONE);
             layoutFreeform.setVisibility(View.VISIBLE);
+            if (q.isMcq()) {
+                textContent.append("\n\nThis saved question is missing its answer choices. Generate a new exam to replace it.");
+            }
         }
     }
 
