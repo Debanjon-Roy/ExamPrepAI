@@ -164,7 +164,7 @@ public class VideoGenerationWorker extends Worker {
             if (!outputDir.exists()) outputDir.mkdirs();
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            File finalVideoFile = new File(outputDir, "ExamPrep_Video_" + timestamp + ".mp4");
+            File finalVideoFile = new File(outputDir, "ExamForge_Video_" + timestamp + ".mp4");
 
             updateProgressNotification("Encoding 720p HD MP4 video with hardware MediaCodec...", 75);
 
@@ -275,7 +275,7 @@ public class VideoGenerationWorker extends Worker {
 
     private void updateProgressNotification(String statusText, int progressPercent) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setContentTitle("ExamPrep AI • Video Studio")
+                .setContentTitle("ExamForge • Video Studio")
                 .setContentText(statusText)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setOngoing(true)
@@ -287,7 +287,12 @@ public class VideoGenerationWorker extends Worker {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pi);
 
-        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC));
+        } else {
+            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build()));
+        }
     }
 
     private void postCompleteNotification(String projectName, File videoFile) {
@@ -323,7 +328,7 @@ public class VideoGenerationWorker extends Worker {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
-                    "ExamPrep Video Production",
+                    "ExamForge Video Production",
                     NotificationManager.IMPORTANCE_LOW
             );
             channel.setDescription("Background rendering and encoding for narrated videos");

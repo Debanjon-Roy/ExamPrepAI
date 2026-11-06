@@ -70,7 +70,7 @@ public class ProjectViewModel extends AndroidViewModel {
     }
 
     public void importFiles(@NonNull List<Uri> uris) {
-        ioExecutor.execute(() -> {
+        runIo(() -> {
             for (Uri uri : uris) {
                 importSingleUri(uri);
             }
@@ -78,7 +78,7 @@ public class ProjectViewModel extends AndroidViewModel {
     }
 
     public void importCameraPhoto(@NonNull Uri photoUri, @NonNull File photoFile) {
-        ioExecutor.execute(() -> {
+        runIo(() -> {
             if (!photoFile.exists() || photoFile.length() == 0) {
                 statusMessage.postValue("Camera photo capture failed");
                 return;
@@ -176,7 +176,7 @@ public class ProjectViewModel extends AndroidViewModel {
     }
 
     public void reExtractFile(@NonNull ProjectFile file) {
-        ioExecutor.execute(() -> {
+        runIo(() -> {
             fileDao.updateExtractedText(file.getId(), null, "extracting");
             file.setTextExtractionStatus("extracting");
             runExtraction(file);
@@ -184,7 +184,7 @@ public class ProjectViewModel extends AndroidViewModel {
     }
 
     public void deleteFile(@NonNull ProjectFile file) {
-        ioExecutor.execute(() -> {
+        runIo(() -> {
             try {
                 File local = new File(file.getFileUri());
                 if (local.exists()) {
@@ -193,6 +193,22 @@ public class ProjectViewModel extends AndroidViewModel {
             } catch (Exception ignored) {}
             fileDao.delete(file);
         });
+    }
+
+    private void runIo(Runnable operation) {
+        ioExecutor.execute(() -> {
+            try {
+                operation.run();
+            } catch (RuntimeException error) {
+                android.util.Log.e("ProjectViewModel", "Material operation failed", error);
+                statusMessage.postValue("Could not update this material. The project may have been removed; reopen it and try again.");
+            }
+        });
+    }
+
+    @Override protected void onCleared() {
+        ioExecutor.shutdown();
+        super.onCleared();
     }
 
     private void runExtraction(ProjectFile projectFile) {

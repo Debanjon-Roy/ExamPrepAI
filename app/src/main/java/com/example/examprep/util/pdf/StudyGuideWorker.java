@@ -96,7 +96,7 @@ public class StudyGuideWorker extends Worker {
         updateProgressNotification("Analyzing materials with ChatGPT (GPT-4o mini)...", 30);
 
         String langName = language.equals("bn") ? "Bengali (বাংলা)" : "English";
-        String systemPrompt = "You are ExamPrep AI. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
+        String systemPrompt = "You are ExamForge. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
                 "Language must be " + langName + ". Detail level: " + detailLevel + ". " +
                 "Do NOT invent facts outside the materials; clearly label anything added from general knowledge under 'general_knowledge_additions'. " +
                 "Output strictly JSON with this schema: " +
@@ -226,7 +226,7 @@ public class StudyGuideWorker extends Worker {
         NotificationManager nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_menu_agenda)
-                .setContentTitle("ExamPrep AI")
+                .setContentTitle("ExamForge")
                 .setContentText(message)
                 .setProgress(100, progress, false)
                 .setOngoing(true)

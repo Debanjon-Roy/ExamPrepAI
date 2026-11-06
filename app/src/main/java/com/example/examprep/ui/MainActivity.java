@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupSidebar() {
+        updateAccountIdentity();
         textSidebarProjectCount = findViewById(R.id.text_sidebar_project_count);
         textStatTimeDevoted = findViewById(R.id.text_stat_time_devoted);
         textStatWorksCount = findViewById(R.id.text_stat_works_count);
@@ -240,6 +241,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void updateAccountIdentity() {
+        com.google.firebase.auth.FirebaseUser user = AuthManager.getCurrentUser();
+        TextView name = findViewById(R.id.text_sidebar_account_name);
+        TextView email = findViewById(R.id.text_sidebar_account_email);
+        if (user == null || name == null || email == null) return;
+        String displayName = user.getDisplayName();
+        String address = user.getEmail();
+        name.setText(displayName == null || displayName.trim().isEmpty() ? "Signed-in account" : displayName);
+        email.setText(address == null || address.trim().isEmpty() ? "Account: " + user.getUid() : address);
+    }
+
     private void updateLanguageLabel() {
         if (textSidebarLangLabel != null) {
             SharedPreferences prefs = UserPaths.prefs(this);
@@ -309,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(Intent.ACTION_SENDTO);
             intent.setData(Uri.parse("mailto:roydebanjon2004@gmail.com"));
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback & Greetings: ExamPrep AI (KUET)");
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback & Greetings: ExamForge (KUET)");
             startActivity(Intent.createChooser(intent, "Send Email to Debanjon Roy"));
         } catch (Exception e) {
             Toast.makeText(this, "Cannot open email client: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -359,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
             textStatWorksCount.setText(count + (count == 1 ? " Work" : " Works"));
         }
         updateLanguageLabel();
+        updateAccountIdentity();
     }
 
     @Override
@@ -412,7 +425,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
+        return (navController != null && appBarConfiguration != null
+                && NavigationUI.navigateUp(navController, appBarConfiguration)) || super.onSupportNavigateUp();
     }
 
     private void requestPermissions() {

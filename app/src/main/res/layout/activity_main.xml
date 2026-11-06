@@ -40,7 +40,7 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Antigravity Sidebar Navigation Drawer -->
+    <!-- ExamForge Sidebar Navigation Drawer -->
     <include
         layout="@layout/layout_sidebar"
         android:layout_width="320dp"

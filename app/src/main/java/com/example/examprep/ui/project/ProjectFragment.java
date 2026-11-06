@@ -68,6 +68,9 @@ public class ProjectFragment extends Fragment {
     private Uri pendingCameraUri;
     private File pendingCameraFile;
     private GenerationManager generationManager;
+    private static final java.util.concurrent.ExecutorService CARD_IO = java.util.concurrent.Executors.newFixedThreadPool(2);
+    private final android.os.Handler uiHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final java.util.List<AlertDialog> generationDialogs = new java.util.ArrayList<>();
 
     private MaterialCardView cardLatestGuide;
     private TextView textGuideMeta;
@@ -307,12 +310,25 @@ public class ProjectFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        for (AlertDialog dialog : new java.util.ArrayList<>(generationDialogs)) dialog.dismiss();
+        generationDialogs.clear();
+        uiHandler.removeCallbacksAndMessages(null);
+        cardLatestGuide = null;
+        cardLatestExam = null;
+        cardLatestSlides = null;
+        cardLatestVideo = null;
+        super.onDestroyView();
+    }
+
     private void refreshLatestPdfCard() {
-        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+        final View requestedView = getView();
+        CARD_IO.execute(() -> {
             try {
                 File pdf = generationManager.getLatestGeneratedPdf(projectId);
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
+                uiHandler.post(() -> {
+                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
                     currentPdfFile = pdf;
                     if (cardLatestGuide != null) {
                         if (currentPdfFile != null && currentPdfFile.exists()) {
@@ -334,13 +350,14 @@ public class ProjectFragment extends Fragment {
     }
 
     private void refreshLatestExamCard() {
-        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+        final View requestedView = getView();
+        CARD_IO.execute(() -> {
             try {
                 File pdf = generationManager.getLatestExamPdf(projectId);
                 ExamQuiz quiz = generationManager.getLatestExamQuiz(projectId);
-                if (!isAdded()) return;
 
-                requireActivity().runOnUiThread(() -> {
+                uiHandler.post(() -> {
+                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
                     currentExamPdfFile = pdf;
                     currentExamQuiz = quiz;
 
@@ -381,13 +398,14 @@ public class ProjectFragment extends Fragment {
     }
 
     private void refreshLatestSlidesCard() {
-        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+        final View requestedView = getView();
+        CARD_IO.execute(() -> {
             try {
                 File pptx = generationManager.getLatestPresentationFile(projectId);
                 PresentationDeck deck = generationManager.getLatestPresentationDeck(projectId);
-                if (!isAdded()) return;
 
-                requireActivity().runOnUiThread(() -> {
+                uiHandler.post(() -> {
+                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
                     currentPptxFile = pptx;
                     currentPresentationDeck = deck;
 
@@ -427,12 +445,13 @@ public class ProjectFragment extends Fragment {
     }
 
     private void refreshLatestVideoCard() {
-        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+        final View requestedView = getView();
+        CARD_IO.execute(() -> {
             try {
                 File video = generationManager.getLatestVideoFile(projectId);
-                if (!isAdded()) return;
 
-                requireActivity().runOnUiThread(() -> {
+                uiHandler.post(() -> {
+                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
                     currentVideoFile = video;
                     if (cardLatestVideo == null) return;
 
@@ -516,15 +535,19 @@ public class ProjectFragment extends Fragment {
                 .setPositiveButton("Close", null)
                 .setCancelable(false)
                 .show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
 
         generationManager.generateExamQuestions(projectId, count, difficulty, type, language, new GenerationManager.ExamGenerationCallback() {
             @Override
             public void onProgress(String message) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 status.setText(message);
             }
 
             @Override
             public void onSuccess(ExamQuiz quiz, File pdfFile, TokenUsage usage, boolean fromCache) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("✓ " + quiz.getQuestions().size() + " Questions & Solutions Ready!");
                 resultsLayout.setVisibility(View.VISIBLE);
@@ -556,6 +579,7 @@ public class ProjectFragment extends Fragment {
 
             @Override
             public void onError(String errorMessage) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("Error: " + errorMessage);
                 status.setTextColor(requireContext().getColor(R.color.error));
@@ -760,15 +784,19 @@ public class ProjectFragment extends Fragment {
                 .setPositiveButton("Close", null)
                 .setCancelable(false)
                 .show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
 
         generationManager.generateStudyGuidePdf(projectId, language, detailLevel, verifyCompleteness, new GenerationManager.PdfGenerationCallback() {
             @Override
             public void onProgress(String message) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 status.setText(message);
             }
 
             @Override
             public void onSuccess(File pdfFile, TokenUsage usage, boolean fromCache) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("✓ Study Guide PDF Generated Successfully!");
                 resultsLayout.setVisibility(View.VISIBLE);
@@ -796,6 +824,7 @@ public class ProjectFragment extends Fragment {
 
             @Override
             public void onError(String errorMessage) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("Error: " + errorMessage);
                 status.setTextColor(requireContext().getColor(R.color.error));
@@ -859,15 +888,19 @@ public class ProjectFragment extends Fragment {
                 .setPositiveButton("Close", null)
                 .setCancelable(false)
                 .show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
 
         generationManager.generatePresentationDeck(projectId, language, detailLevel, new GenerationManager.PresentationGenerationCallback() {
             @Override
             public void onProgress(String message) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 status.setText(message);
             }
 
             @Override
             public void onSuccess(PresentationDeck deck, File pptxFile, TokenUsage usage, boolean fromCache) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("✓ Presentation (.pptx) Created Successfully!");
                 resultsLayout.setVisibility(View.VISIBLE);
@@ -898,6 +931,7 @@ public class ProjectFragment extends Fragment {
 
             @Override
             public void onError(String errorMessage) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
                 status.setText("Error: " + errorMessage);
                 status.setTextColor(requireContext().getColor(R.color.error));
@@ -935,7 +969,6 @@ public class ProjectFragment extends Fragment {
             btnInstallTts.setVisibility(View.GONE);
 
             TtsNarrationHelper.checkLanguageAvailability(requireContext(), targetLang, (isAvailable, needsDownload, message) -> {
-                if (!isAdded()) return;
                 if (isAvailable) {
                     textTtsTitle.setText("✓ TTS Voice Available");
                     textTtsTitle.setTextColor(requireContext().getColor(R.color.primary));
@@ -1037,6 +1070,8 @@ public class ProjectFragment extends Fragment {
                 .setPositiveButton("Close", null)
                 .setCancelable(false)
                 .show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
 
         List<ProjectFile> files = viewModel.getFiles().getValue();
         boolean hasExtractedText = false;
@@ -1051,17 +1086,19 @@ public class ProjectFragment extends Fragment {
         }
 
         if (hasExtractedText) {
-            String systemInstruction = "You are ExamPrep AI. Analyze the uploaded study material and return strict JSON summarizing the content. Ground every point strictly in the provided material without hallucinating.";
+            String systemInstruction = "You are ExamForge. Analyze the uploaded study material and return strict JSON summarizing the content. Ground every point strictly in the provided material without hallucinating.";
             String userPrompt = "Return a JSON object with this exact schema: {\"title\": \"Title\", \"total_topics\": 3, \"core_topics\": [\"topic1\", \"topic2\"], \"key_takeaways\": [\"point1\", \"point2\"], \"verification_status\": \"grounded\"}";
 
             generationManager.generateOrFetch(projectId, "ai_test_summary", systemInstruction, userPrompt, new GenerationManager.GenerationCallback() {
                 @Override
                 public void onProgress(String message) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     status.setText(message);
                 }
 
                 @Override
                 public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     progressBar.setVisibility(View.GONE);
                     status.setText(fromCache ? "✓ Loaded from local Room cache (zero cost)" : "✓ Live response received and validated");
                     resultsLayout.setVisibility(View.VISIBLE);
@@ -1081,6 +1118,7 @@ public class ProjectFragment extends Fragment {
 
                 @Override
                 public void onError(String errorMessage) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     progressBar.setVisibility(View.GONE);
                     status.setText("Error: " + errorMessage);
                     status.setTextColor(requireContext().getColor(R.color.error));
@@ -1090,11 +1128,13 @@ public class ProjectFragment extends Fragment {
             generationManager.testAiConnection(new GenerationManager.GenerationCallback() {
                 @Override
                 public void onProgress(String message) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     status.setText(message);
                 }
 
                 @Override
                 public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     progressBar.setVisibility(View.GONE);
                     status.setText("✓ Connection to ChatGPT / OpenAI API successful!");
                     resultsLayout.setVisibility(View.VISIBLE);
@@ -1107,6 +1147,7 @@ public class ProjectFragment extends Fragment {
 
                 @Override
                 public void onError(String errorMessage) {
+                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                     progressBar.setVisibility(View.GONE);
                     status.setText("Error: " + errorMessage);
                     status.setTextColor(requireContext().getColor(R.color.error));
@@ -1143,6 +1184,8 @@ public class ProjectFragment extends Fragment {
         });
 
         dialog.show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
     }
 
     private void launchFilePicker() {

@@ -26,6 +26,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ExamPrepAI"
+rootProject.name = "ExamForge"
 include(":app")
  

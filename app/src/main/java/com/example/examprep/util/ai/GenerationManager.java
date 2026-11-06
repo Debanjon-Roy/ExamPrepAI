@@ -52,7 +52,7 @@ public class GenerationManager {
     private final AiProvider aiProvider;
     private final AppDatabase database;
     private final java.io.File ownerFilesDir;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public GenerationManager(@NonNull Context context) {
@@ -200,7 +200,7 @@ public class GenerationManager {
             PdfGenerationCallback callback
     ) {
         String langName = language.equals("bn") ? "Bengali (বাংলা)" : "English";
-        String systemInstruction = "You are ExamPrep AI. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
+        String systemInstruction = "You are ExamForge. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
                 "Language must be " + langName + ". Detail level: " + detailLevel + ". " +
                 "Do NOT invent facts outside the materials; clearly label anything added from general knowledge under 'general_knowledge_additions'. " +
                 "Output strictly JSON with this schema: " +
@@ -431,7 +431,7 @@ public class GenerationManager {
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
-        java.io.File[] files = outputDir.listFiles((dir, name) -> name.startsWith("ExamPrep_Video_") && name.endsWith(".mp4"));
+        java.io.File[] files = outputDir.listFiles((dir, name) -> (name.startsWith("ExamForge_Video_") || name.startsWith("ExamPrep_Video_")) && name.endsWith(".mp4"));
         if (files == null || files.length == 0) {
             return null;
         }

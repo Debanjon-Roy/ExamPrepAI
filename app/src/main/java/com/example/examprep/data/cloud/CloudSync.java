@@ -79,7 +79,8 @@ public final class CloudSync {
         });
     }
 
-    public static void pushProject(@NonNull String uid, @NonNull Project p) {
+    public static void pushProject(@NonNull String uid, @androidx.annotation.Nullable Project p) {
+        if (p == null) return;
         if (!uid.equals(UserPaths.currentUid()) || UserPaths.SIGNED_OUT.equals(uid)) return;
         Map<String, Object> data = new HashMap<>();
         data.put("name", p.getName());

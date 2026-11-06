@@ -109,7 +109,7 @@ public class StudyGuidePdfGenerator {
                     .setMarginBottom(8));
 
             String dateStr = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(new Date());
-            String metaText = String.format("Language: %s  •  Generated on: %s  •  ExamPrep AI",
+            String metaText = String.format("Language: %s  •  Generated on: %s  •  ExamForge",
                     language.equals("bn") ? "বাংলা (Bengali)" : "English", dateStr);
 
             headerBox.add(new Paragraph(metaText)
@@ -317,7 +317,7 @@ public class StudyGuidePdfGenerator {
                     .setPadding(10)
                     .setMarginTop(18);
 
-            certBox.add(new Paragraph("✓ ExamPrep AI Verification Complete")
+            certBox.add(new Paragraph("✓ ExamForge Verification Complete")
                     .setFontSize(10.5f)
                     .setFont(fontBold)
                     .setFontColor(COLOR_PRIMARY));

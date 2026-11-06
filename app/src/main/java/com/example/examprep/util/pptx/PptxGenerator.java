@@ -69,7 +69,7 @@ public class PptxGenerator {
                 fallback.setSlideNumber(1);
                 fallback.setLayout("title");
                 fallback.setHeader(projectName);
-                fallback.setSubheader("ExamPrep AI Study Deck");
+                fallback.setSubheader("ExamForge Study Deck");
                 slides.add(fallback);
             }
 
@@ -165,8 +165,8 @@ public class PptxGenerator {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
                 "  <dc:title>" + escapeXml(title) + "</dc:title>\n" +
-                "  <dc:creator>ExamPrep AI</dc:creator>\n" +
-                "  <cp:lastModifiedBy>ExamPrep AI</cp:lastModifiedBy>\n" +
+                "  <dc:creator>ExamForge</dc:creator>\n" +
+                "  <cp:lastModifiedBy>ExamForge</cp:lastModifiedBy>\n" +
                 "  <dcterms:created xsi:type=\"dcterms:W3CDTF\">" + isoDate + "</dcterms:created>\n" +
                 "  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">" + isoDate + "</dcterms:modified>\n" +
                 "</cp:coreProperties>";
@@ -177,7 +177,7 @@ public class PptxGenerator {
                 "<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\">\n" +
                 "  <TotalTime>0</TotalTime>\n" +
                 "  <Words>0</Words>\n" +
-                "  <Application>ExamPrep AI</Application>\n" +
+                "  <Application>ExamForge</Application>\n" +
                 "  <PresentationFormat>Widescreen</PresentationFormat>\n" +
                 "  <Slides>" + slideCount + "</Slides>\n" +
                 "  <Notes>" + slideCount + "</Notes>\n" +
@@ -338,7 +338,7 @@ public class PptxGenerator {
             sb.append(buildTextShape(shapeId++, 914400, 3900000, 10363200, 1000000, subtitle, 2200, false, "B0C4DE", "l", "t"));
 
             // Bottom metadata badge
-            String footer = "ExamPrep AI • " + totalSlides + " Slides • Academic Preparation";
+            String footer = "ExamForge • " + totalSlides + " Slides • Academic Preparation";
             sb.append(buildTextShape(shapeId++, 914400, 5600000, 10363200, 500000, footer, 1400, false, COLOR_AMBER, "l", "t"));
 
         } else if ("agenda".equalsIgnoreCase(slide.getLayout())) {
@@ -427,7 +427,7 @@ public class PptxGenerator {
     }
 
     private static String buildFooter(int shapeId, int slideNum, int totalSlides, String projectName) {
-        String footerText = projectName + " • ExamPrep AI • Slide " + slideNum + " of " + totalSlides;
+        String footerText = projectName + " • ExamForge • Slide " + slideNum + " of " + totalSlides;
         return buildTextShape(shapeId, 800000, 6300000, 10592000, 350000, footerText, 1100, false, "8C9BAE", "r", "ctr");
     }
 

@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 public class HomeViewModel extends AndroidViewModel {
 
     private final String ownerUid = com.example.examprep.util.UserPaths.currentUid();
+    private static final java.util.concurrent.ExecutorService IO = Executors.newSingleThreadExecutor();
     private final ProjectDao projectDao;
     private final LiveData<List<Project>> allProjects;
 
@@ -32,7 +33,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void createProject(String name, String description, String language) {
-        Executors.newSingleThreadExecutor().execute(() -> {
+        IO.execute(() -> {
             Project project = new Project(name);
             if (description != null) {
                 project.setDescription(description);
@@ -47,7 +48,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void deleteProject(Project project) {
-        Executors.newSingleThreadExecutor().execute(() -> {
+        IO.execute(() -> {
             projectDao.delete(project);
             CloudSync.deleteProject(ownerUid, project.getId());
         });
