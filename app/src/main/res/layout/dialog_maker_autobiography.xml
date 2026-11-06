@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <!-- Header Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_hero_card"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_accent_chip">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_academic_cap"
+                    app:tint="@color/accent_dark"
+                    android:contentDescription="KUET" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Debanjon Roy"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Computer Science &amp; Engineering (CSE)"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#E0E7FF"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khulna University of Engineering and Technology (KUET)"
+                android:textSize="12sp"
+                android:textColor="#C7D2FE"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Biography Body -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="About the Maker"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:layout_marginTop="18dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello! I am Debanjon Roy, an enthusiastic Computer Science and Engineering undergraduate student at Khulna University of Engineering and Technology (KUET), Bangladesh.\n\nDeeply driven by artificial intelligence, full-stack software development, and developer tooling, I created ExamPrep AI as an Antigravity-grade intelligent study companion. My mission is to revolutionize how students prepare for university exams by transforming dense lecture notes, syllabuses, and slides into structured study guides, rigorous practice exams, presentation decks, and narrated video lectures.\n\nEvery algorithm, user experience detail, and intelligent pipeline in this app is engineered with dedication to empowering students everywhere to study faster, understand deeper, and excel."
+            android:textSize="14sp"
+            android:lineSpacingExtra="5dp"
+            android:textColor="@color/on_surface_medium"
+            android:layout_marginTop="8dp" />
+
+        <!-- Contact Info Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/card_stroke"
+            app:cardBackgroundColor="@color/surface_variant">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Direct Contact"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface" />
+
+                <!-- Email -->
+                <LinearLayout
+                    android:id="@+id/dialog_maker_email_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_email_maker"
+                        app:tint="@color/primary"
+                        android:contentDescription="Email" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="roydebanjon2004@gmail.com"
+                        android:textSize="13sp"
+                        android:textColor="@color/primary"
+                        android:textStyle="bold"
+                        android:layout_marginStart="10dp" />
+                </LinearLayout>
+
+                <!-- WhatsApp -->
+                <LinearLayout
+                    android:id="@+id/dialog_maker_whatsapp_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_whatsapp_maker"
+                        android:contentDescription="WhatsApp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+8801741816336 (WhatsApp)"
+                        android:textSize="13sp"
+                        android:textColor="#15803D"
+                        android:textStyle="bold"
+                        android:layout_marginStart="10dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

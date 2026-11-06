@@ -35,6 +35,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.examprep.ExamPrepApp;
 import com.example.examprep.R;
+import com.example.examprep.auth.AuthManager;
+import com.example.examprep.auth.WelcomeActivity;
 import com.example.examprep.data.model.Project;
 import com.example.examprep.ui.settings.SettingsActivity;
 import com.example.examprep.util.SecurePrefs;
@@ -63,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Guard: this screen requires a signed-in user.
+        if (!AuthManager.isLoggedIn()) {
+            goToWelcome();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -364,7 +373,28 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         }
+        if (item.getItemId() == R.id.action_logout) {
+            confirmLogout();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void confirmLogout() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.logout_title)
+                .setMessage(R.string.logout_message)
+                .setPositiveButton(R.string.action_logout,
+                        (dialog, which) -> AuthManager.signOut(this, this::goToWelcome))
+                .setNegativeButton(R.string.dialog_cancel, null)
+                .show();
+    }
+
+    private void goToWelcome() {
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

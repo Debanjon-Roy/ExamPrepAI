@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Modern Vibrant Academic Palette (Dark Mode) -->
+    <color name="primary">#818CF8</color>
+    <color name="primary_dark">#6366F1</color>
+    <color name="primary_light">#A5B4FC</color>
+    <color name="primary_container">#312E81</color>
+    <color name="on_primary_container">#E0E7FF</color>
+
+    <!-- Warm Coral & Rose Accents -->
+    <color name="accent">#FB7185</color>
+    <color name="accent_dark">#E11D48</color>
+    <color name="accent_light">#4C0519</color>
+
+    <!-- Deep Sleek Midnight Dark Surfaces & Backgrounds -->
+    <color name="background">#0F172A</color>
+    <color name="surface">#1E293B</color>
+    <color name="surface_variant">#334155</color>
+    <color name="card_stroke">#334155</color>
+    <color name="chip_border_primary">#3730A3</color>
+    <color name="chip_border_accent">#881337</color>
+
+    <!-- High-Contrast Dark Mode Typography -->
+    <color name="on_primary">#0F172A</color>
+    <color name="on_surface">#F8FAFC</color>
+    <color name="on_surface_medium">#CBD5E1</color>
+    <color name="on_surface_light">#94A3B8</color>
+
+    <!-- Feedback & Status Colors -->
+    <color name="error">#F87171</color>
+    <color name="error_light">#450A0A</color>
+    <color name="success">#34D399</color>
+    <color name="success_light">#064E3B</color>
+    <color name="warning">#FBBF24</color>
+    <color name="divider">#1E293B</color>
+
+    <!-- Distinct Feature Badges (Dark Mode) -->
+    <color name="badge_guide_bg">#1E1B4B</color>
+    <color name="badge_guide_text">#A5B4FC</color>
+    <color name="badge_exam_bg">#064E3B</color>
+    <color name="badge_exam_text">#6EE7B7</color>
+    <color name="badge_slides_bg">#451A03</color>
+    <color name="badge_slides_text">#FDBA74</color>
+    <color name="badge_video_bg">#3B0764</color>
+    <color name="badge_video_text">#D8B4FE</color>
+
+    <!-- Hero Gradient Colors (Dark Mode) -->
+    <color name="hero_start">#312E81</color>
+    <color name="hero_center">#4C1D95</color>
+    <color name="hero_end">#581C87</color>
+
+    <!-- Project Card Gradient (Dark Mode) -->
+    <color name="card_gradient_start">#312E81</color>
+    <color name="card_gradient_end">#4C1D95</color>
+</resources>

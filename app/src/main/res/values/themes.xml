@@ -73,4 +73,14 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
     </style>
+
+    <!-- Welcome screen feature row -->
+    <style name="WelcomeFeature">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textSize">15sp</item>
+    </style>
 </resources>

@@ -28,16 +28,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExamPrepAI">
 
-        <!-- Main Activity (launcher) -->
+        <!-- Welcome / Login (launcher) -->
         <activity
-            android:name=".ui.MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop">
+            android:name=".auth.WelcomeActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Main Activity (requires login) -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!-- Settings Activity -->
         <activity

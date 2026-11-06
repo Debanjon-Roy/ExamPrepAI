@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -106,6 +107,13 @@ dependencies {
     implementation(libs.media3.common)
     implementation(libs.media3.effect)
     implementation(libs.media3.muxer)
+
+    // Firebase Auth + Google Sign-In (Credential Manager)
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     // Testing
     testImplementation(libs.junit)

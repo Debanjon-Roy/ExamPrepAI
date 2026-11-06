@@ -67,4 +67,18 @@
     <!-- Languages -->
     <string name="lang_english">English</string>
     <string name="lang_bengali">বাংলা (Bengali)</string>
+
+    <!-- Welcome / Auth -->
+    <string name="welcome_title">Welcome to ExamPrep AI</string>
+    <string name="welcome_tagline">Turn your notes into study guides, slides, quizzes and videos.</string>
+    <string name="welcome_feature_1">📄  Upload PDFs, slides, spreadsheets or photos</string>
+    <string name="welcome_feature_2">🧠  Generate study guides and exam questions with AI</string>
+    <string name="welcome_feature_3">🎬  Create slide decks and revision videos</string>
+    <string name="login_with_google">Continue with Google</string>
+    <string name="login_footer">Sign in with your Google account to get started.</string>
+    <string name="login_error_generic">Sign-in failed. Please check your connection and try again.</string>
+    <string name="login_error_no_account">No Google account found on this device. Add one in Settings and retry.</string>
+    <string name="action_logout">Log out</string>
+    <string name="logout_title">Log out?</string>
+    <string name="logout_message">You will need to sign in with Google again to use the app.</string>
 </resources>
