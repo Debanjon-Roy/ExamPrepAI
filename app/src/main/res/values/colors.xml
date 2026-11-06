@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Modern Vibrant Academic Palette -->
+    <!-- Modern Vibrant Academic Palette (Light) -->
     <color name="primary">#4F46E5</color>
     <color name="primary_dark">#3730A3</color>
     <color name="primary_light">#818CF8</color>
@@ -17,6 +17,8 @@
     <color name="surface">#FFFFFF</color>
     <color name="surface_variant">#F1F5F9</color>
     <color name="card_stroke">#E2E8F0</color>
+    <color name="chip_border_primary">#C7D2FE</color>
+    <color name="chip_border_accent">#FECDD3</color>
 
     <!-- Typography Colors -->
     <color name="on_primary">#FFFFFF</color>

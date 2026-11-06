@@ -164,17 +164,22 @@ public class MainActivity extends AppCompatActivity {
         boolean isDark = themePrefs.getBoolean(PREF_DARK_THEME, false);
         if (switchThemeMode != null) {
             switchThemeMode.setChecked(isDark);
+            switchThemeMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked != themePrefs.getBoolean(PREF_DARK_THEME, false)) {
+                    themePrefs.edit().putBoolean(PREF_DARK_THEME, isChecked).apply();
+                    AppCompatDelegate.setDefaultNightMode(
+                            isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                    );
+                }
+            });
         }
 
         View btnSidebarTheme = findViewById(R.id.btn_sidebar_theme);
         if (btnSidebarTheme != null) {
             btnSidebarTheme.setOnClickListener(v -> {
-                boolean newDark = !switchThemeMode.isChecked();
-                switchThemeMode.setChecked(newDark);
-                themePrefs.edit().putBoolean(PREF_DARK_THEME, newDark).apply();
-                AppCompatDelegate.setDefaultNightMode(
-                        newDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                );
+                if (switchThemeMode != null) {
+                    switchThemeMode.toggle();
+                }
             });
         }
 

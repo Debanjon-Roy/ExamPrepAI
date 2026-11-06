@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_marginTop="6dp"
-        android:background="#F5F5F5"
+        android:background="@color/surface_variant"
         android:padding="10dp">
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:fontFamily="monospace"
-            android:textColor="#333333"
+            android:textColor="@color/on_surface"
             android:textIsSelectable="true" />
 
     </androidx.core.widget.NestedScrollView>
