@@ -1,5 +1,7 @@
 package com.example.examprep.util.pdf;
 
+import com.example.examprep.util.UserPaths;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -51,7 +53,7 @@ public class StudyGuidePdfGenerator {
             @NonNull String language
     ) throws Exception {
 
-        File outputDir = new File(context.getFilesDir(), "generated/" + projectId);
+        File outputDir = new File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }

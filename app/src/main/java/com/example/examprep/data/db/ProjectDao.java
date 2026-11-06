@@ -36,6 +36,9 @@ public interface ProjectDao {
     @Query("SELECT * FROM projects WHERE id = :id")
     Project getProjectByIdSync(long id);
 
+    @Query("SELECT COUNT(*) FROM projects")
+    int getProjectCount();
+
     @Query("UPDATE projects SET updatedAt = :date WHERE id = :id")
     void updateTimestamp(long id, Date date);
 }

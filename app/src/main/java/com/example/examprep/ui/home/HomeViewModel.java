@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import com.example.examprep.ExamPrepApp;
+import com.example.examprep.data.cloud.CloudSync;
 import com.example.examprep.data.db.ProjectDao;
 import com.example.examprep.data.model.Project;
 import java.util.List;
@@ -38,11 +39,16 @@ public class HomeViewModel extends AndroidViewModel {
             if (language != null) {
                 project.setLanguage(language);
             }
-            projectDao.insert(project);
+            long id = projectDao.insert(project);
+            project.setId(id);
+            CloudSync.pushProject(project);
         });
     }
 
     public void deleteProject(Project project) {
-        Executors.newSingleThreadExecutor().execute(() -> projectDao.delete(project));
+        Executors.newSingleThreadExecutor().execute(() -> {
+            projectDao.delete(project);
+            CloudSync.deleteProject(project.getId());
+        });
     }
 }

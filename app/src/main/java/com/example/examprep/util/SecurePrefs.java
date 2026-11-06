@@ -15,7 +15,7 @@ import java.security.GeneralSecurityException;
 public class SecurePrefs {
 
     private static final String TAG = "SecurePrefs";
-    private static final String PREFS_FILE = "secure_prefs";
+    private static final String PREFS_FILE_BASE = "secure_prefs";
     private static final String KEY_API_KEY = "openai_api_key";
     private static final String LEGACY_KEY_API_KEY = "anthropic_api_key";
     private static final String KEY_DAILY_CAP = "daily_spending_cap";
@@ -25,6 +25,8 @@ public class SecurePrefs {
     private final SharedPreferences prefs;
 
     public SecurePrefs(Context context) {
+        // One encrypted file per Google account, so API keys/spending are never shared.
+        final String PREFS_FILE = PREFS_FILE_BASE + "_" + UserPaths.currentUid();
         SharedPreferences temp = null;
         try {
             MasterKey masterKey = new MasterKey.Builder(context)

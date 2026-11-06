@@ -1,5 +1,7 @@
 package com.example.examprep.ui.settings;
 
+import com.example.examprep.util.UserPaths;
+
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        getPreferenceManager().setSharedPreferencesName(UserPaths.prefsName());
         setPreferencesFromResource(R.xml.preferences, rootKey);
         securePrefs = new SecurePrefs(requireContext());
 

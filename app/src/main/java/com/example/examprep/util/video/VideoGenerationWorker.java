@@ -1,5 +1,7 @@
 package com.example.examprep.util.video;
 
+import com.example.examprep.util.UserPaths;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -152,7 +154,7 @@ public class VideoGenerationWorker extends Worker {
             mainHandler.post(tts::shutdown);
 
             // 4. Encode Slideshow to MP4 using Hardware MediaCodec + MediaMuxer
-            File outputDir = new File(getApplicationContext().getFilesDir(), "generated/" + projectId);
+            File outputDir = new File(UserPaths.filesDir(getApplicationContext()), "generated/" + projectId);
             if (!outputDir.exists()) outputDir.mkdirs();
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());

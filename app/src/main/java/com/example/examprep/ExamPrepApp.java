@@ -7,7 +7,6 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 public class ExamPrepApp extends Application {
     
     private static ExamPrepApp instance;
-    private AppDatabase database;
     
     @Override
     public void onCreate() {
@@ -23,7 +22,6 @@ public class ExamPrepApp extends Application {
         );
 
         PDFBoxResourceLoader.init(getApplicationContext());
-        database = AppDatabase.getInstance(this);
     }
     
     public static ExamPrepApp getInstance() {
@@ -31,6 +29,7 @@ public class ExamPrepApp extends Application {
     }
     
     public AppDatabase getDatabase() {
-        return database;
+        // Resolved per call so it always matches the signed-in account.
+        return AppDatabase.getInstance(this);
     }
 }

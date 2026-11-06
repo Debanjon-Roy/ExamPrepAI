@@ -1,5 +1,7 @@
 package com.example.examprep.util.pptx;
 
+import com.example.examprep.util.UserPaths;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 
@@ -42,7 +44,7 @@ public class PptxGenerator {
             @NonNull String projectName,
             @NonNull PresentationDeck deck
     ) throws IOException {
-        File outputDir = new File(context.getFilesDir(), "generated/" + projectId);
+        File outputDir = new File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }

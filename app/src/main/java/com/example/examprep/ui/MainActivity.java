@@ -1,5 +1,7 @@
 package com.example.examprep.ui;
 
+import com.example.examprep.util.UserPaths;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +39,7 @@ import com.example.examprep.ExamPrepApp;
 import com.example.examprep.R;
 import com.example.examprep.auth.AuthManager;
 import com.example.examprep.auth.WelcomeActivity;
+import com.example.examprep.data.cloud.CloudSync;
 import com.example.examprep.data.model.Project;
 import com.example.examprep.ui.settings.SettingsActivity;
 import com.example.examprep.util.SecurePrefs;
@@ -71,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
             goToWelcome();
             return;
         }
+
+        // Create/refresh this user's Firestore profile and restore their projects if needed.
+        CloudSync.onSignedIn(getApplicationContext());
 
         setContentView(R.layout.activity_main);
 
@@ -236,14 +242,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateLanguageLabel() {
         if (textSidebarLangLabel != null) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences prefs = UserPaths.prefs(this);
             String lang = prefs.getString("language", "en");
             textSidebarLangLabel.setText("bn".equals(lang) ? "বাংলা" : "English");
         }
     }
 
     private void showLanguageSwitchDialog() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = UserPaths.prefs(this);
         String currentLang = prefs.getString("language", "en");
         int selectedIndex = "bn".equals(currentLang) ? 1 : 0;
 
@@ -281,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
                             if (!desc.isEmpty()) project.setDescription(desc);
                             project.setLanguage(lang);
                             long id = ExamPrepApp.getInstance().getDatabase().projectDao().insert(project);
+                            project.setId(id);
+                            CloudSync.pushProject(project);
 
                             runOnUiThread(() -> {
                                 Bundle args = new Bundle();
@@ -337,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!AuthManager.isLoggedIn()) return;
         UserStatsManager.getInstance(this).onSessionStart();
 
         if (textStatTimeDevoted != null) {
@@ -352,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (!AuthManager.isLoggedIn()) return;
         UserStatsManager.getInstance(this).onSessionPause();
     }
 

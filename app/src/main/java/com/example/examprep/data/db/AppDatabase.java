@@ -11,6 +11,7 @@ import com.example.examprep.data.model.CostRecord;
 import com.example.examprep.data.model.GenerationCache;
 import com.example.examprep.data.model.Project;
 import com.example.examprep.data.model.ProjectFile;
+import com.example.examprep.util.UserPaths;
 
 @Database(
         entities = {Project.class, ProjectFile.class, GenerationCache.class, CostRecord.class},
@@ -20,7 +21,8 @@ import com.example.examprep.data.model.ProjectFile;
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static volatile AppDatabase INSTANCE;
+    private static AppDatabase INSTANCE;
+    private static String instanceUid;
 
     public abstract ProjectDao projectDao();
 
@@ -30,19 +32,29 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract CostRecordDao costRecordDao();
 
-    public static AppDatabase getInstance(Context context) {
-        if (INSTANCE == null) {
-            synchronized (AppDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
-                            context.getApplicationContext(),
-                            AppDatabase.class,
-                            "examprep_db"
-                    )
+    static String dbNameFor(String uid) {
+        return "examprep_db_" + uid;
+    }
+
+    /**
+     * Returns the database that belongs to the CURRENTLY signed-in Google account.
+     * If the account changed since the last call, a different database file is opened.
+     */
+    public static synchronized AppDatabase getInstance(Context context) {
+        Context app = context.getApplicationContext();
+        String uid = UserPaths.currentUid();
+
+        if (INSTANCE == null || !uid.equals(instanceUid)) {
+            boolean adoptedLegacy = LegacyMigration.claim(app, uid);
+
+            INSTANCE = Room.databaseBuilder(app, AppDatabase.class, dbNameFor(uid))
                     .allowMainThreadQueries()
                     .fallbackToDestructiveMigration()
                     .build();
-                }
+            instanceUid = uid;
+
+            if (adoptedLegacy) {
+                LegacyMigration.fixFilePaths(app, INSTANCE);
             }
         }
         return INSTANCE;

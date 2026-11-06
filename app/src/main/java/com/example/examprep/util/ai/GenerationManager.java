@@ -1,5 +1,7 @@
 package com.example.examprep.util.ai;
 
+import com.example.examprep.util.UserPaths;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -171,7 +173,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestGeneratedPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(context.getFilesDir(), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -313,7 +315,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestExamPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(context.getFilesDir(), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -394,7 +396,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestPresentationFile(long projectId) {
-        java.io.File outputDir = new java.io.File(context.getFilesDir(), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }
@@ -412,7 +414,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestVideoFile(long projectId) {
-        java.io.File outputDir = new java.io.File(context.getFilesDir(), "generated/" + projectId);
+        java.io.File outputDir = new java.io.File(UserPaths.filesDir(context), "generated/" + projectId);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
             return null;
         }

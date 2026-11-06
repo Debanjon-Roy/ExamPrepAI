@@ -15,16 +15,21 @@ public class UserStatsManager {
     private static final String KEY_SESSION_COUNT = "session_count";
 
     private static UserStatsManager instance;
+    private static String instanceUid;
     private final SharedPreferences prefs;
     private long sessionStartElapsed = 0;
 
-    private UserStatsManager(Context context) {
-        this.prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    private UserStatsManager(Context context, String uid) {
+        this.prefs = context.getApplicationContext()
+                .getSharedPreferences(PREFS_NAME + "_" + uid, Context.MODE_PRIVATE);
     }
 
+    /** One stats object per signed-in account; switching accounts gives a fresh one. */
     public static synchronized UserStatsManager getInstance(Context context) {
-        if (instance == null) {
-            instance = new UserStatsManager(context);
+        String uid = UserPaths.currentUid();
+        if (instance == null || !uid.equals(instanceUid)) {
+            instance = new UserStatsManager(context, uid);
+            instanceUid = uid;
         }
         return instance;
     }
@@ -84,7 +89,7 @@ public class UserStatsManager {
 
         int fileCount = 0;
         try {
-            File genDir = new File(context.getFilesDir(), "generated");
+            File genDir = new File(UserPaths.filesDir(context), "generated");
             if (genDir.exists()) {
                 File[] projects = genDir.listFiles();
                 if (projects != null) {

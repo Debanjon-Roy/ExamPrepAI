@@ -1,5 +1,7 @@
 package com.example.examprep.ui.project;
 
+import com.example.examprep.util.UserPaths;
+
 import android.app.Application;
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -132,7 +134,7 @@ public class ProjectViewModel extends AndroidViewModel {
         }
 
         // Copy file to project folder
-        File projectDir = new File(getApplication().getFilesDir(), "projects/" + projectId);
+        File projectDir = new File(UserPaths.filesDir(getApplication()), "projects/" + projectId);
         if (!projectDir.exists()) {
             projectDir.mkdirs();
         }
