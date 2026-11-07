@@ -730,7 +730,7 @@ public class ProjectFragment extends Fragment {
             public void onSuccess(ExamQuiz quiz, File pdfFile, TokenUsage usage, boolean fromCache) {
                 if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
-                status.setText("✓ " + quiz.getQuestions().size() + " Questions & Solutions Ready!");
+                status.setText("" + quiz.getQuestions().size() + " Questions & Solutions Ready!");
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
@@ -979,7 +979,7 @@ public class ProjectFragment extends Fragment {
             public void onSuccess(File pdfFile, TokenUsage usage, boolean fromCache) {
                 if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
-                status.setText("✓ Study Guide PDF Generated Successfully!");
+                status.setText("Study Guide PDF Generated Successfully!");
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
@@ -1083,7 +1083,7 @@ public class ProjectFragment extends Fragment {
             public void onSuccess(PresentationDeck deck, File pptxFile, TokenUsage usage, boolean fromCache) {
                 if (!isAdded() || getView() == null || !dialog.isShowing()) return;
                 progressBar.setVisibility(View.GONE);
-                status.setText("✓ Presentation (.pptx) Created Successfully!");
+                status.setText("Presentation (.pptx) Created Successfully!");
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
@@ -1145,23 +1145,23 @@ public class ProjectFragment extends Fragment {
 
         Runnable checkTts = () -> {
             String targetLang = rbLangBn.isChecked() ? "bn" : "en";
-            textTtsTitle.setText("🔊 Checking TTS Voice Engine...");
+            textTtsTitle.setText("Checking TTS Voice Engine...");
             textTtsDesc.setText("Testing language pack availability...");
             btnInstallTts.setVisibility(View.GONE);
 
             TtsNarrationHelper.checkLanguageAvailability(requireContext(), targetLang, (isAvailable, needsDownload, message) -> {
                 if (isAvailable) {
-                    textTtsTitle.setText("✓ TTS Voice Available");
+                    textTtsTitle.setText("TTS Voice Available");
                     textTtsTitle.setTextColor(requireContext().getColor(R.color.primary));
                     textTtsDesc.setText(targetLang.equals("bn") ? "Bengali speech synthesis engine ready" : "English speech synthesis engine ready");
                     btnInstallTts.setVisibility(View.GONE);
                 } else if (needsDownload) {
-                    textTtsTitle.setText("⚠️ Voice Data Not Installed");
+                    textTtsTitle.setText("Voice Data Not Installed");
                     textTtsTitle.setTextColor(requireContext().getColor(R.color.accent_dark));
                     textTtsDesc.setText(message);
                     btnInstallTts.setVisibility(View.VISIBLE);
                 } else {
-                    textTtsTitle.setText("⚠️ Language Unsupported by Current TTS Engine");
+                    textTtsTitle.setText("Language Unsupported by Current TTS Engine");
                     textTtsTitle.setTextColor(requireContext().getColor(R.color.error));
                     textTtsDesc.setText(message);
                     btnInstallTts.setVisibility(View.VISIBLE);
@@ -1217,7 +1217,7 @@ public class ProjectFragment extends Fragment {
 
         WorkManager.getInstance(requireContext()).enqueue(workRequest);
 
-        Toast.makeText(requireContext(), "🎬 Video generation started in background! Check notification for progress.", Toast.LENGTH_LONG).show();
+        Toast.makeText(requireContext(), "Video generation started in background! Check notification for progress.", Toast.LENGTH_LONG).show();
 
         WorkManager.getInstance(requireContext())
                 .getWorkInfoByIdLiveData(workRequest.getId())
@@ -1225,7 +1225,7 @@ public class ProjectFragment extends Fragment {
                     if (workInfo != null) {
                         if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                             refreshLatestVideoCard();
-                            Toast.makeText(requireContext(), "🎬 Narrated Video is ready to watch!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "Narrated Video is ready to watch!", Toast.LENGTH_SHORT).show();
                         } else if (workInfo.getState() == WorkInfo.State.FAILED) {
                             String error = workInfo.getOutputData().getString(VideoGenerationWorker.KEY_ERROR);
                             Toast.makeText(requireContext(), error != null ? error : "Video generation failed. Please retry.", Toast.LENGTH_LONG).show();

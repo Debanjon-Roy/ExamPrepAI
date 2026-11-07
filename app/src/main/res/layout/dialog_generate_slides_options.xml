@@ -117,7 +117,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="✨ Deck Features Included"
+                    android:text="Deck Features Included"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary" />

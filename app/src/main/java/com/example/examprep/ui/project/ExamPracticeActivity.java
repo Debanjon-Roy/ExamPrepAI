@@ -235,7 +235,7 @@ public class ExamPracticeActivity extends AppCompatActivity {
                         answersRecorded.set(currentIndex, true);
                     }
 
-                    textFeedbackTitle.setText("✓ Correct! (Answer: " + correctKey + ")");
+                    textFeedbackTitle.setText("Correct! (Answer: " + correctKey + ")");
                     textFeedbackTitle.setTextColor(getColor(R.color.success));
                 } else {
                     btn.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.error)));
@@ -255,7 +255,7 @@ public class ExamPracticeActivity extends AppCompatActivity {
                         answersRecorded.set(currentIndex, false);
                     }
 
-                    textFeedbackTitle.setText("✗ Incorrect. (Correct Answer: " + correctKey + ")");
+                    textFeedbackTitle.setText("Incorrect. (Correct Answer: " + correctKey + ")");
                     textFeedbackTitle.setTextColor(getColor(R.color.error));
                 }
 

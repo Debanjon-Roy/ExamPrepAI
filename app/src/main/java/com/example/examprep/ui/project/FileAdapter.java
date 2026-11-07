@@ -111,26 +111,26 @@ public class FileAdapter extends ListAdapter<ProjectFile, FileAdapter.FileViewHo
             switch (file.getTextExtractionStatus()) {
                 case "done":
                     if (file.getOcrText() != null) {
-                        textStatus.setText(String.format("✓ OCR (%d w)", wordCount));
+                        textStatus.setText(String.format("OCR (%d w)", wordCount));
                     } else {
-                        textStatus.setText(String.format("✓ Text (%d w)", wordCount));
+                        textStatus.setText(String.format("Text (%d w)", wordCount));
                     }
                     textStatus.setTextColor(itemView.getContext().getColor(R.color.success));
                     break;
                 case "ocr_needed":
-                    textStatus.setText("⏳ Needs OCR");
+                    textStatus.setText("Needs OCR");
                     textStatus.setTextColor(itemView.getContext().getColor(R.color.warning));
                     break;
                 case "extracting":
-                    textStatus.setText("⏳ Extracting...");
+                    textStatus.setText("Extracting...");
                     textStatus.setTextColor(itemView.getContext().getColor(R.color.warning));
                     break;
                 case "failed":
-                    textStatus.setText("✗ Failed");
+                    textStatus.setText("Failed");
                     textStatus.setTextColor(itemView.getContext().getColor(R.color.error));
                     break;
                 default:
-                    textStatus.setText("⏳ Pending");
+                    textStatus.setText("Pending");
                     textStatus.setTextColor(itemView.getContext().getColor(R.color.on_surface_medium));
                     break;
             }

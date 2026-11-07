@@ -119,7 +119,7 @@
                     android:id="@+id/text_tts_status_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🔊 Checking TTS Voice Data..."
+                    android:text="Checking TTS Voice Data..."
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary" />
@@ -148,7 +148,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ℹ️ Runs in the background via WorkManager. You can turn off your screen or use other apps while the video renders."
+            android:text="Runs in the background via WorkManager. You can turn off your screen or use other apps while the video renders."
             android:textSize="11sp"
             android:textColor="@color/on_surface_light"
             android:layout_marginTop="14dp" />

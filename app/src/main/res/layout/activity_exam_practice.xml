@@ -179,7 +179,7 @@
                         android:id="@+id/text_feedback_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="✓ Correct! (Answer: B)"
+                        android:text="Correct! (Answer: B)"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="@color/success" />
