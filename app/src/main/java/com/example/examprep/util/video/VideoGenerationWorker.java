@@ -52,9 +52,11 @@ public class VideoGenerationWorker extends Worker {
     public static final String KEY_LANGUAGE = "language";
     public static final String KEY_DETAIL_LEVEL = "detail_level";
     public static final String KEY_OUTPUT_VIDEO_PATH = "output_video_path";
+    public static final String KEY_ERROR = "error";
 
     private String ownerUid;
     private AppDatabase ownerDatabase;
+    private long lastNotificationAt;
 
     private static final String CHANNEL_ID = "examprep_video_generation_channel";
     private static final int NOTIFICATION_ID = 2002;
@@ -88,6 +90,12 @@ public class VideoGenerationWorker extends Worker {
             return Result.failure();
         }
 
+        final AtomicReference<TextToSpeech> ttsRef = new AtomicReference<>();
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        File tempDir = null;
+        File finalVideoFile = null;
+        boolean complete = false;
+        List<SlideshowVideoEncoder.SlideMedia> slideMediaList = new ArrayList<>();
         try {
             // 1. Fetch or generate presentation slide outline
             updateProgressNotification("Generating slide outline and narration scripts with ChatGPT...", 15);
@@ -99,14 +107,13 @@ public class VideoGenerationWorker extends Worker {
             // 2. Initialize TextToSpeech engine
             updateProgressNotification("Initializing speech synthesizer...", 25);
             CountDownLatch ttsInitLatch = new CountDownLatch(1);
-            AtomicReference<TextToSpeech> ttsRef = new AtomicReference<>();
-            Handler mainHandler = new Handler(Looper.getMainLooper());
 
             mainHandler.post(() -> {
                 final TextToSpeech[] holder = new TextToSpeech[1];
                 holder[0] = new TextToSpeech(getApplicationContext(), status -> {
                     if (status == TextToSpeech.SUCCESS) {
-                        ttsRef.set(holder[0]);
+                        if (isStopped()) holder[0].shutdown();
+                        else ttsRef.set(holder[0]);
                     }
                     ttsInitLatch.countDown();
                 });
@@ -114,21 +121,21 @@ public class VideoGenerationWorker extends Worker {
 
             ttsInitLatch.await(10, TimeUnit.SECONDS);
             TextToSpeech tts = ttsRef.get();
-            if (tts == null) {
-                return Result.failure();
-            }
+            if (tts == null) throw new java.io.IOException("Speech synthesis could not start. Please check your text-to-speech engine.");
 
             Locale targetLocale = "bn".equals(language) ? new Locale("bn", "BD") : Locale.US;
 
-            File tempDir = new File(getApplicationContext().getCacheDir(), "video_temp_" + System.currentTimeMillis());
+            tempDir = new File(getApplicationContext().getCacheDir(), "video_temp_" + System.currentTimeMillis());
             if (!tempDir.exists()) tempDir.mkdirs();
 
-            List<SlideshowVideoEncoder.SlideMedia> slideMediaList = new ArrayList<>();
             List<SlideOutline> slides = deck.getSlides();
             int totalSlides = slides.size();
 
             // 3. Render slide images and synthesize audio per slide
             for (int i = 0; i < totalSlides; i++) {
+                if (isStopped() || !ownerUid.equals(UserPaths.currentUid())) {
+                    throw new java.util.concurrent.CancellationException("Video generation cancelled");
+                }
                 SlideOutline slide = slides.get(i);
                 int slideNum = i + 1;
                 int progressPercent = 30 + (int) (((float) slideNum / totalSlides) * 40f);
@@ -147,6 +154,9 @@ public class VideoGenerationWorker extends Worker {
                 boolean synthOk = TtsNarrationHelper.synthesizeToFileSync(tts, notes, audioFile, targetLocale, 20);
 
                 long durationMs = TtsNarrationHelper.getAudioDurationMs(audioFile);
+                if (!synthOk) {
+                    audioFile.delete(); // A partial WAV must not be treated as successful narration.
+                }
                 if (!synthOk || durationMs < 2000) {
                     durationMs = 4000; // fallback 4 seconds per slide
                 } else {
@@ -158,39 +168,46 @@ public class VideoGenerationWorker extends Worker {
 
             // Shutdown TTS
             mainHandler.post(tts::shutdown);
+            ttsRef.set(null);
 
             // 4. Encode Slideshow to MP4 using Hardware MediaCodec + MediaMuxer
             File outputDir = new File(UserPaths.filesDir(getApplicationContext(), ownerUid), "generated/" + projectId);
             if (!outputDir.exists()) outputDir.mkdirs();
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            File finalVideoFile = new File(outputDir, "ExamForge_Video_" + timestamp + ".mp4");
+            finalVideoFile = new File(outputDir, "ExamForge_Video_" + timestamp + ".mp4");
 
             updateProgressNotification("Encoding 720p HD MP4 video with hardware MediaCodec...", 75);
 
             SlideshowVideoEncoder.encodeSlideshow(slideMediaList, finalVideoFile, (currentSlide, total, status) -> {
-                int percent = 75 + (int) (((float) currentSlide / total) * 20f);
+                int percent;
+                if (status.startsWith("Encoding narration")) percent = 71 + currentSlide * 5 / total;
+                else if (status.startsWith("Combining")) percent = 97;
+                else percent = 77 + (currentSlide - 1) * 18 / total;
                 updateProgressNotification(status, percent);
-            });
-
-            // 5. Clean up temporary bitmaps & WAV files
-            for (SlideshowVideoEncoder.SlideMedia sm : slideMediaList) {
-                if (sm.bitmap != null && !sm.bitmap.isRecycled()) {
-                    sm.bitmap.recycle();
-                }
-            }
-            deleteRecursive(tempDir);
+            }, () -> isStopped() || !ownerUid.equals(UserPaths.currentUid()));
 
             // 6. Notify complete
             postCompleteNotification(project.getName(), finalVideoFile);
+            complete = true;
 
             return Result.success(new Data.Builder()
                     .putString(KEY_OUTPUT_VIDEO_PATH, finalVideoFile.getAbsolutePath())
                     .build());
 
         } catch (Exception e) {
-            updateProgressNotification("Video production failed: " + e.getMessage(), 0);
-            return Result.failure();
+            android.util.Log.e("VideoGenerationWorker", "Video production failed", e);
+            String message = e.getMessage() != null ? e.getMessage() : "The device could not encode this video.";
+            if (!isStopped()) postFailureNotification(message);
+            return Result.failure(new Data.Builder().putString(KEY_ERROR, message).build());
+        } finally {
+            TextToSpeech tts = ttsRef.getAndSet(null);
+            if (tts != null) mainHandler.post(tts::shutdown);
+            for (SlideshowVideoEncoder.SlideMedia media : slideMediaList) {
+                if (media.bitmap != null && !media.bitmap.isRecycled()) media.bitmap.recycle();
+            }
+            if (tempDir != null) deleteRecursive(tempDir);
+            if (!complete && finalVideoFile != null) finalVideoFile.delete();
         }
     }
 
@@ -274,6 +291,11 @@ public class VideoGenerationWorker extends Worker {
     }
 
     private void updateProgressNotification(String statusText, int progressPercent) {
+        if (isStopped()) return;
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (lastNotificationAt != 0 && now - lastNotificationAt < 500) return;
+        lastNotificationAt = now;
+        setProgressAsync(new Data.Builder().putString("status", statusText).putInt("progress", progressPercent).build());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setContentTitle("ExamForge • Video Studio")
                 .setContentText(statusText)
@@ -287,12 +309,26 @@ public class VideoGenerationWorker extends Worker {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pi);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= 35) {
+            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build(),
                     android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC));
         } else {
             setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, builder.build()));
         }
+    }
+
+    private void postFailureNotification(String message) {
+        NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null) return;
+        manager.notify(NOTIFICATION_ID + 1, new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setContentTitle("ExamForge video generation failed")
+                .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setAutoCancel(true).build());
     }
 
     private void postCompleteNotification(String projectName, File videoFile) {

@@ -1046,7 +1046,8 @@ public class ProjectFragment extends Fragment {
                             refreshLatestVideoCard();
                             Toast.makeText(requireContext(), "🎬 Narrated Video is ready to watch!", Toast.LENGTH_SHORT).show();
                         } else if (workInfo.getState() == WorkInfo.State.FAILED) {
-                            Toast.makeText(requireContext(), "Video generation failed", Toast.LENGTH_SHORT).show();
+                            String error = workInfo.getOutputData().getString(VideoGenerationWorker.KEY_ERROR);
+                            Toast.makeText(requireContext(), error != null ? error : "Video generation failed. Please retry.", Toast.LENGTH_LONG).show();
                         }
                     }
                 });

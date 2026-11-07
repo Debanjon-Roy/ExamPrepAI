@@ -118,6 +118,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    // Align the instrumented-test graph with the ExifInterface version in the app.
+    androidTestImplementation("androidx.exifinterface:exifinterface:1.3.6")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
