@@ -420,6 +420,14 @@
                     android:textColor="@color/error"
                     style="@style/Widget.Material3.Button.TextButton" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_video_from_saved_slides"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/video_from_saved_slides"
+                    style="@style/Widget.ExamPrep.Button.Outlined" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -534,6 +542,22 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/restore_study_guide"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_restore_questions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/restore_questions"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_restore_presentation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/restore_presentation"
             style="@style/Widget.ExamPrep.Button.Outlined" />
 
         <!-- 6. Study Materials Card -->

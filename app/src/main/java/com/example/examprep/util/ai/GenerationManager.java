@@ -398,6 +398,8 @@ public class GenerationManager {
                                 quiz, ownerFilesDir
                         );
 
+                        com.example.examprep.data.cloud.StudyGuideBackup.saveQuestions(
+                                ownerUid, projectId, projectName, language, resultJson, pdfFile);
                         mainHandler.post(() -> callback.onSuccess(quiz, pdfFile, usage, fromCache));
                     } catch (Exception e) {
                         mainHandler.post(() -> callback.onError("Failed to render Exam PDF: " + e.getMessage()));
@@ -492,6 +494,7 @@ public class GenerationManager {
                 executor.execute(() -> {
                     mainHandler.post(() -> callback.onProgress("Building OpenXML Presentation (.pptx) file with custom Vintage Blue theme..."));
                     try {
+                        com.example.examprep.data.cloud.RestoredPresentation.verifyJson(resultJson);
                         com.example.examprep.data.model.slide.PresentationDeck deck =
                                 com.example.examprep.data.model.slide.PresentationDeck.fromJson(resultJson);
                         Project project = database.projectDao().getProjectByIdSync(projectId);
@@ -504,6 +507,8 @@ public class GenerationManager {
                                 deck, ownerFilesDir
                         );
 
+                        com.example.examprep.data.cloud.StudyGuideBackup.savePresentation(
+                                ownerUid, projectId, projectName, language, resultJson, pptxFile);
                         mainHandler.post(() -> callback.onSuccess(deck, pptxFile, usage, fromCache));
                     } catch (Exception e) {
                         mainHandler.post(() -> callback.onError("Failed to create PPTX: " + e.getMessage()));

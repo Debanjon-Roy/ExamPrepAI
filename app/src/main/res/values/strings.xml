@@ -89,4 +89,7 @@
         <item quantity="other">%d saved items</item>
     </plurals>
     <string name="restore_study_guide">Restore Study Guide from Cloud</string>
+    <string name="restore_questions">Restore Questions from Cloud</string>
+    <string name="restore_presentation">Restore Slides and Narration from Cloud</string>
+    <string name="video_from_saved_slides">Create Video from Saved Slides</string>
 </resources>

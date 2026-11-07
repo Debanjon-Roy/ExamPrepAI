@@ -269,6 +269,21 @@ public class ProjectFragment extends Fragment {
 
         view.findViewById(R.id.btn_manage_generated).setOnClickListener(v -> showGeneratedItems("all"));
         view.findViewById(R.id.btn_restore_guide).setOnClickListener(v -> showRestoreGuides());
+        view.findViewById(R.id.btn_restore_questions).setOnClickListener(v -> showRestoreContent(RestoreKind.QUESTIONS));
+        view.findViewById(R.id.btn_restore_presentation).setOnClickListener(v -> showRestoreContent(RestoreKind.PRESENTATION));
+        view.findViewById(R.id.btn_video_from_saved_slides).setOnClickListener(v -> {
+            if (currentPresentationDeck == null || currentPresentationDeck.getSlides().isEmpty()) {
+                Toast.makeText(requireContext(), "Restore or generate a presentation first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            AlertDialog confirm = new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Create video from saved slides?")
+                    .setMessage("Use the saved slide content and narration with your phone’s text-to-speech engine. No AI request is needed.")
+                    .setPositiveButton("Create Video", (d, w) -> startVideoGeneration(
+                            currentPresentationDeck.getLanguage(), "standard", true))
+                    .setNegativeButton("Cancel", null).show();
+            trackRestoreDialog(confirm);
+        });
         view.findViewById(R.id.btn_delete_guide).setOnClickListener(v -> showGeneratedItems("guide"));
         view.findViewById(R.id.btn_delete_exam).setOnClickListener(v -> showGeneratedItems("exam"));
         view.findViewById(R.id.btn_delete_slides).setOnClickListener(v -> showGeneratedItems("slides"));
@@ -506,15 +521,26 @@ public class ProjectFragment extends Fragment {
     }
 
     private void showRestoreGuides() {
+        showRestoreContent(RestoreKind.STUDY_GUIDE);
+    }
+
+    private enum RestoreKind { STUDY_GUIDE, QUESTIONS, PRESENTATION }
+
+    private void showRestoreContent(RestoreKind kind) {
+        boolean questions = kind == RestoreKind.QUESTIONS;
+        boolean presentation = kind == RestoreKind.PRESENTATION;
         final View original = getView();
         final String uid = generatedOwnerUid;
         if (!restoreViewActive(original, uid)) return;
         AlertDialog loading = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.restore_study_guide)
-                .setMessage("Looking for your backed-up study guides…")
+                .setTitle(presentation ? R.string.restore_presentation : questions ? R.string.restore_questions : R.string.restore_study_guide)
+                .setMessage(presentation ? "Looking for your backed-up slides and narration…"
+                        : questions ? "Looking for your backed-up question sets…" : "Looking for your backed-up study guides…")
                 .setNegativeButton("Cancel", null).show();
         trackRestoreDialog(loading);
-        com.example.examprep.data.cloud.StudyGuideRestore.list(uid, projectId)
+        (presentation ? com.example.examprep.data.cloud.StudyGuideRestore.listPresentations(uid, projectId)
+                : questions ? com.example.examprep.data.cloud.StudyGuideRestore.listQuestions(uid, projectId)
+                : com.example.examprep.data.cloud.StudyGuideRestore.list(uid, projectId))
                 .addOnCompleteListener(task -> {
                     if (!restoreViewActive(original, uid) || !loading.isShowing()) return;
                     loading.dismiss();
@@ -524,7 +550,9 @@ public class ProjectFragment extends Fragment {
                     }
                     java.util.List<com.example.examprep.data.cloud.StudyGuideRestore.Backup> backups = task.getResult();
                     if (backups.isEmpty()) {
-                        showRestoreError("No study-guide backups found for this project. Generate a study-guide PDF with the updated app first.");
+                        showRestoreError(presentation ? "No presentation backups found. Generate a presentation or video with the updated app first." : questions
+                                ? "No question-set backups found for this project. Generate questions with the updated app first."
+                                : "No study-guide backups found for this project. Generate a study-guide PDF with the updated app first.");
                         return;
                     }
                     String[] labels = new String[backups.size()];
@@ -534,27 +562,35 @@ public class ProjectFragment extends Fragment {
                                 + (b.date != null ? " • " + new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(b.date) : "");
                     }
                     AlertDialog picker = new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Choose a study guide to restore")
-                            .setItems(labels, (d, which) -> restoreGuide(backups.get(which), original, uid))
+                            .setTitle(presentation ? "Choose slides and narration to restore"
+                                    : questions ? "Choose a question set to restore" : "Choose a study guide to restore")
+                            .setItems(labels, (d, which) -> restoreGuide(backups.get(which), original, uid, kind))
                             .setNegativeButton("Cancel", null).show();
                     trackRestoreDialog(picker);
                 });
     }
 
     private void restoreGuide(com.example.examprep.data.cloud.StudyGuideRestore.Backup backup,
-                              View original, String uid) {
+                              View original, String uid, RestoreKind kind) {
+        boolean questions = kind == RestoreKind.QUESTIONS;
+        boolean presentation = kind == RestoreKind.PRESENTATION;
         if (!restoreViewActive(original, uid)) return;
         AlertDialog progress = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Restoring study guide")
-                .setMessage("Downloading saved content and rebuilding your PDF. No AI request is needed.")
+                .setTitle(presentation ? "Restoring slides and narration" : questions ? "Restoring questions" : "Restoring study guide")
+                .setMessage(presentation ? "Downloading your slides and speaker notes and rebuilding the presentation. No AI request is needed."
+                        : questions ? "Downloading your questions, answers, and rubrics and rebuilding the printable PDF. No AI request is needed."
+                        : "Downloading saved content and rebuilding your PDF. No AI request is needed.")
                 .setNegativeButton("Close", null).show();
         trackRestoreDialog(progress);
-        com.example.examprep.data.cloud.StudyGuideRestore.restore(requireContext(), uid,
-                projectId, "Study Guide", backup).addOnCompleteListener(task -> {
+        (presentation ? com.example.examprep.data.cloud.StudyGuideRestore.restorePresentation(requireContext(), uid, projectId, backup)
+                : questions ? com.example.examprep.data.cloud.StudyGuideRestore.restoreQuestions(requireContext(), uid, projectId, backup)
+                : com.example.examprep.data.cloud.StudyGuideRestore.restore(requireContext(), uid,
+                projectId, "Study Guide", backup)).addOnCompleteListener(task -> {
                     if (!restoreViewActive(original, uid)) return;
                     if (task.isSuccessful()) {
                         outputRevision++;
-                        refreshLatestPdfCard();
+                        if (presentation) refreshLatestSlidesCard();
+                        else if (questions) refreshLatestExamCard(); else refreshLatestPdfCard();
                     }
                     if (!progress.isShowing()) return;
                     progress.dismiss();
@@ -566,9 +602,13 @@ public class ProjectFragment extends Fragment {
                     }
                     File pdf = task.getResult();
                     AlertDialog done = new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("PDF restored")
-                            .setMessage("Your study guide is saved on this device and ready to open.")
-                            .setPositiveButton("Open PDF", (d, w) -> openPdf(pdf))
+                            .setTitle(presentation ? "Presentation restored" : questions ? "Questions restored" : "PDF restored")
+                            .setMessage(presentation ? "Your presentation is ready. You can also create a video from its saved slides and narration."
+                                    : questions ? "Your questions are ready in Start Practice. The printable PDF is also saved on this device."
+                                    : "Your study guide is saved on this device and ready to open.")
+                            .setPositiveButton(presentation ? "Open PPTX" : "Open PDF", (d, w) -> {
+                                if (presentation) openPptx(pdf); else openPdf(pdf);
+                            })
                             .setNegativeButton("Done", null).show();
                     trackRestoreDialog(done);
                 });
@@ -576,7 +616,7 @@ public class ProjectFragment extends Fragment {
 
     private void showRestoreError(String message) {
         AlertDialog error = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.restore_study_guide).setMessage(message)
+                .setTitle("Restore from Cloud").setMessage(message)
                 .setPositiveButton("OK", null).show();
         trackRestoreDialog(error);
     }
@@ -1290,11 +1330,16 @@ public class ProjectFragment extends Fragment {
     }
 
     private void startVideoGeneration(String language, String detailLevel) {
+        startVideoGeneration(language, detailLevel, false);
+    }
+
+    private void startVideoGeneration(String language, String detailLevel, boolean savedOnly) {
         Data inputData = new Data.Builder()
                 .putString("owner_uid", com.example.examprep.util.UserPaths.currentUid())
                 .putLong(VideoGenerationWorker.KEY_PROJECT_ID, projectId)
                 .putString(VideoGenerationWorker.KEY_LANGUAGE, language)
                 .putString(VideoGenerationWorker.KEY_DETAIL_LEVEL, detailLevel)
+                .putBoolean(VideoGenerationWorker.KEY_USE_SAVED_DECK, savedOnly)
                 .build();
 
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(VideoGenerationWorker.class)
