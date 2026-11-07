@@ -177,21 +177,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestGeneratedPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
-        if (!outputDir.exists() || !outputDir.isDirectory()) {
-            return null;
-        }
-        java.io.File[] files = outputDir.listFiles((dir, name) -> name.startsWith("StudyGuide_") && name.endsWith(".pdf"));
-        if (files == null || files.length == 0) {
-            return null;
-        }
-        java.io.File latest = files[0];
-        for (java.io.File f : files) {
-            if (f.lastModified() > latest.lastModified()) {
-                latest = f;
-            }
-        }
-        return latest;
+        return latestExport(projectId, "guide");
     }
 
     public void generateStudyGuidePdf(
@@ -322,21 +308,7 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestExamPdf(long projectId) {
-        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
-        if (!outputDir.exists() || !outputDir.isDirectory()) {
-            return null;
-        }
-        java.io.File[] files = outputDir.listFiles((dir, name) -> name.startsWith("ExamPractice_") && name.endsWith(".pdf"));
-        if (files == null || files.length == 0) {
-            return null;
-        }
-        java.io.File latest = files[0];
-        for (java.io.File f : files) {
-            if (f.lastModified() > latest.lastModified()) {
-                latest = f;
-            }
-        }
-        return latest;
+        return latestExport(projectId, "exam");
     }
 
     public com.example.examprep.data.model.exam.ExamQuiz getLatestExamQuiz(long projectId) {
@@ -417,39 +389,11 @@ public class GenerationManager {
     }
 
     public java.io.File getLatestPresentationFile(long projectId) {
-        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
-        if (!outputDir.exists() || !outputDir.isDirectory()) {
-            return null;
-        }
-        java.io.File[] files = outputDir.listFiles((dir, name) -> name.startsWith("Presentation_") && name.endsWith(".pptx"));
-        if (files == null || files.length == 0) {
-            return null;
-        }
-        java.io.File latest = files[0];
-        for (java.io.File f : files) {
-            if (f.lastModified() > latest.lastModified()) {
-                latest = f;
-            }
-        }
-        return latest;
+        return latestExport(projectId, "slides");
     }
 
     public java.io.File getLatestVideoFile(long projectId) {
-        java.io.File outputDir = new java.io.File(ownerFilesDir, "generated/" + projectId);
-        if (!outputDir.exists() || !outputDir.isDirectory()) {
-            return null;
-        }
-        java.io.File[] files = outputDir.listFiles((dir, name) -> (name.startsWith("ExamForge_Video_") || name.startsWith("ExamPrep_Video_")) && name.endsWith(".mp4"));
-        if (files == null || files.length == 0) {
-            return null;
-        }
-        java.io.File latest = files[0];
-        for (java.io.File f : files) {
-            if (f.lastModified() > latest.lastModified()) {
-                latest = f;
-            }
-        }
-        return latest;
+        return latestExport(projectId, "video");
     }
 
     public com.example.examprep.data.model.slide.PresentationDeck getLatestPresentationDeck(long projectId) {
@@ -528,6 +472,18 @@ public class GenerationManager {
 
     private void postProgress(GenerationCallback callback, String msg) {
         mainHandler.post(() -> callback.onProgress(msg));
+    }
+
+    private java.io.File latestExport(long projectId, String kind) {
+        try {
+            for (com.example.examprep.util.GeneratedFiles.Item item :
+                    new com.example.examprep.util.GeneratedFiles(ownerFilesDir, projectId).list()) {
+                if (kind.equals(item.kind)) return item.file;
+            }
+        } catch (java.io.IOException error) {
+            android.util.Log.w("GenerationManager", "Could not list saved files", error);
+        }
+        return null;
     }
 
     private void postSuccess(GenerationCallback callback, String json, TokenUsage usage, boolean fromCache) {

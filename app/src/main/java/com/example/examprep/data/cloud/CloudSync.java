@@ -41,6 +41,33 @@ public final class CloudSync {
 
     private CloudSync() {}
 
+    public static com.google.android.gms.tasks.Task<Void> renameProject(Context context, String uid,
+                                                                        long projectId, String name) {
+        Context app = context.getApplicationContext();
+        return com.google.android.gms.tasks.Tasks.call(IO, () -> {
+            if (!uid.equals(UserPaths.currentUid()) || UserPaths.SIGNED_OUT.equals(uid))
+                throw new IllegalStateException("Account changed");
+            if (name.trim().isEmpty() || name.length() > 120)
+                throw new IllegalArgumentException("Enter a project name of up to 120 characters.");
+            ProjectDao dao = AppDatabase.getInstance(app, uid).projectDao();
+            if (dao.rename(projectId, name.trim(), new Date()) == 0)
+                throw new IllegalStateException("Project no longer exists");
+            pushProject(uid, dao.getProjectByIdSync(projectId));
+            return null;
+        });
+    }
+
+    public static void renameGeneratedFile(String uid, long projectId, String oldName, String newName) {
+        if (!uid.equals(UserPaths.currentUid()) || UserPaths.SIGNED_OUT.equals(uid)) return;
+        projectsCol(uid).document(String.valueOf(projectId)).collection("generatedContent")
+                .whereEqualTo("fileName", oldName).get().addOnSuccessListener(snapshot -> {
+                    if (!uid.equals(UserPaths.currentUid())) return;
+                    for (DocumentSnapshot doc : snapshot) doc.getReference().update(
+                            "fileName", newName, "customFileName", true)
+                            .addOnFailureListener(e -> Log.w(TAG, "Backup filename update failed", e));
+                }).addOnFailureListener(e -> Log.w(TAG, "Backup filename lookup failed", e));
+    }
+
     private static DocumentReference userDoc(String uid) {
         return FirebaseFirestore.getInstance().collection("users").document(uid);
     }

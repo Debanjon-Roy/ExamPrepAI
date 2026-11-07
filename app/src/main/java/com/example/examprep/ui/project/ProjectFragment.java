@@ -261,6 +261,15 @@ public class ProjectFragment extends Fragment {
 
         view.findViewById(R.id.btn_manage_generated).setOnClickListener(v -> showGeneratedItems("all"));
         view.findViewById(R.id.btn_open_generated).setOnClickListener(v -> showGeneratedItems("all", GeneratedAction.OPEN));
+        view.findViewById(R.id.btn_rename_generated).setOnClickListener(v -> showGeneratedItems("all", GeneratedAction.RENAME));
+        view.findViewById(R.id.btn_rename_project).setOnClickListener(v -> {
+            Project project = viewModel.getProject().getValue();
+            if (project == null) return;
+            com.example.examprep.ui.RenameDialog.show(this, "Rename Project", project.getName(),
+                    name -> com.example.examprep.data.cloud.CloudSync.renameProject(requireContext(),
+                            generatedOwnerUid, projectId, name),
+                    () -> Toast.makeText(requireContext(), "Project renamed.", Toast.LENGTH_SHORT).show());
+        });
         view.findViewById(R.id.btn_restore_guide).setOnClickListener(v -> showRestoreGuides());
         view.findViewById(R.id.btn_restore_questions).setOnClickListener(v -> showRestoreContent(RestoreKind.QUESTIONS));
         view.findViewById(R.id.btn_restore_presentation).setOnClickListener(v -> showRestoreContent(RestoreKind.PRESENTATION));
@@ -356,7 +365,7 @@ public class ProjectFragment extends Fragment {
         showGeneratedItems(category, GeneratedAction.DELETE);
     }
 
-    private enum GeneratedAction { OPEN, SHARE, DELETE }
+    private enum GeneratedAction { OPEN, SHARE, RENAME, DELETE }
 
     private void showGeneratedItems(String category, GeneratedAction action) {
         final View requestedView = getView();
@@ -365,14 +374,10 @@ public class ProjectFragment extends Fragment {
                 java.util.List<GeneratedChoice> items = new java.util.ArrayList<>();
                 for (com.example.examprep.util.GeneratedFiles.Item file : generatedFiles.list()) {
                     String name = file.file.getName();
-                    boolean matches = "all".equals(category)
-                            || ("guide".equals(category) && name.startsWith("StudyGuide_"))
-                            || ("exam".equals(category) && name.startsWith("ExamPractice_"))
-                            || ("slides".equals(category) && name.endsWith(".pptx"))
-                            || ("video".equals(category) && name.endsWith(".mp4"));
+                    boolean matches = "all".equals(category) || category.equals(file.kind);
                     if (matches) items.add(new GeneratedChoice(name, file.modified, file, 0));
                 }
-                if (action != GeneratedAction.SHARE && ("all".equals(category) || "questions".equals(category)
+                if (action != GeneratedAction.SHARE && action != GeneratedAction.RENAME && ("all".equals(category) || "questions".equals(category)
                         || ("exam".equals(category) && action == GeneratedAction.DELETE))) {
                     for (com.example.examprep.data.model.GenerationCache cache : generatedCacheDao.getQuestionSets(projectId)) {
                         if (cache.getResultJson() == null || cache.getResultJson().isEmpty()) continue;
@@ -394,6 +399,7 @@ public class ProjectFragment extends Fragment {
                     TextView count = picker.findViewById(R.id.text_generated_count);
                     TextView hint = picker.findViewById(R.id.text_generated_hint);
                     hint.setText(action == GeneratedAction.DELETE ? getString(R.string.generated_delete_hint)
+                            : action == GeneratedAction.RENAME ? "Choose a file to rename. Its file type and extension are preserved."
                             : action == GeneratedAction.SHARE ? "Choose the saved file you want to share."
                             : "Choose a saved item to open. Question sets open in practice mode.");
                     count.setText(getResources().getQuantityString(R.plurals.generated_saved_items, items.size(), items.size()));
@@ -404,6 +410,7 @@ public class ProjectFragment extends Fragment {
                     list.getLayoutParams().height = Math.min(maxHeight, (int) (items.size() * 230 * density));
                     AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                             .setTitle(action == GeneratedAction.DELETE ? "Select an Item to Delete"
+                                    : action == GeneratedAction.RENAME ? "Choose a File to Rename"
                                     : action == GeneratedAction.SHARE ? "Choose an Item to Share"
                                     : "questions".equals(category) ? "Choose Questions to Practice" : "Choose an Item to Open")
                             .setView(picker)
@@ -411,6 +418,7 @@ public class ProjectFragment extends Fragment {
                     list.setAdapter(new GeneratedDeleteAdapter(items, action, item -> {
                         dialog.dismiss();
                         if (action == GeneratedAction.DELETE) confirmGeneratedDeletion(item, category);
+                        else if (action == GeneratedAction.RENAME) renameGeneratedChoice(item);
                         else openGeneratedChoice(item, action, requestedView);
                     }));
                     dialog.show();
@@ -466,6 +474,29 @@ public class ProjectFragment extends Fragment {
         });
     }
 
+    private void renameGeneratedChoice(GeneratedChoice item) {
+        if (item.file == null) return;
+        String oldName = item.file.file.getName();
+        String stem = oldName.substring(0, oldName.lastIndexOf('.'));
+        com.example.examprep.ui.RenameDialog.show(this, "Rename Generated File", stem,
+                name -> com.google.android.gms.tasks.Tasks.call(CARD_IO, () -> {
+                    if (!generatedOwnerUid.equals(com.example.examprep.util.UserPaths.currentUid()))
+                        throw new IllegalStateException("Account changed");
+                    File renamed = generatedFiles.rename(item.file, name);
+                    com.example.examprep.data.cloud.CloudSync.renameGeneratedFile(
+                            generatedOwnerUid, projectId, oldName, renamed.getName());
+                    return renamed;
+                }), () -> {
+                    outputRevision++;
+                    refreshLatestPdfCard();
+                    refreshLatestExamCard();
+                    refreshLatestSlidesCard();
+                    refreshLatestVideoCard();
+                    Toast.makeText(requireContext(), "File renamed.", Toast.LENGTH_SHORT).show();
+                    showGeneratedItems("all", GeneratedAction.RENAME);
+                });
+    }
+
     private static final class GeneratedDeleteAdapter extends RecyclerView.Adapter<GeneratedDeleteAdapter.Holder> {
         private final java.util.List<GeneratedChoice> items;
         private final GeneratedAction action;
@@ -495,15 +526,15 @@ public class ProjectFragment extends Fragment {
             android.content.Context context = holder.itemView.getContext();
             String type = "Study guide PDF";
             int background = R.color.badge_guide_bg, foreground = R.color.badge_guide_text;
-            if (item.file == null || item.label.startsWith("ExamPractice_")) {
+            if (item.file == null || "exam".equals(item.file.kind)) {
                 type = item.file == null ? "Question set" : "Exam PDF";
                 background = R.color.badge_exam_bg;
                 foreground = R.color.badge_exam_text;
-            } else if (item.label.endsWith(".mp4")) {
+            } else if ("video".equals(item.file.kind)) {
                 type = "Video";
                 background = R.color.badge_video_bg;
                 foreground = R.color.badge_video_text;
-            } else if (item.label.endsWith(".pptx")) {
+            } else if ("slides".equals(item.file.kind)) {
                 type = "Presentation";
                 background = R.color.badge_slides_bg;
                 foreground = R.color.badge_slides_text;
@@ -516,6 +547,7 @@ public class ProjectFragment extends Fragment {
             if (item.file != null) details += "  •  " + android.text.format.Formatter.formatShortFileSize(context, item.file.size);
             holder.meta.setText(details);
             String verb = action == GeneratedAction.DELETE ? "Delete"
+                    : action == GeneratedAction.RENAME ? "Rename"
                     : action == GeneratedAction.SHARE ? "Share"
                     : item.file == null ? "Practice" : item.label.endsWith(".mp4") ? "Play" : "Open";
             holder.delete.setText(verb);

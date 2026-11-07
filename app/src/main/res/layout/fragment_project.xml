@@ -123,6 +123,14 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_rename_project"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Rename Project"
+            style="@style/Widget.Material3.Button.TextButton" />
+
         <!-- 2. Generated Study Guide Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_latest_guide"
@@ -542,6 +550,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Manage Generated Items"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_rename_generated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Rename Generated File"
             style="@style/Widget.ExamPrep.Button.Outlined" />
 
         <com.google.android.material.button.MaterialButton

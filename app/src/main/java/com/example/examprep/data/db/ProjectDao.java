@@ -44,4 +44,7 @@ public interface ProjectDao {
 
     @Query("UPDATE projects SET updatedAt = :date WHERE id = :id")
     void updateTimestamp(long id, Date date);
+
+    @Query("UPDATE projects SET name = :name, updatedAt = :date WHERE id = :id")
+    int rename(long id, String name, Date date);
 }

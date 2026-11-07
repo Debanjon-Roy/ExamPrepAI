@@ -34,6 +34,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        final String homeOwnerUid = com.example.examprep.util.UserPaths.currentUid();
 
         recyclerView = view.findViewById(R.id.recycler_projects);
         emptyView = view.findViewById(R.id.text_empty);
@@ -52,11 +53,22 @@ public class HomeFragment extends Fragment {
                 navCtrl.navigate(R.id.action_home_to_project, args);
             }
         }, project -> {
-            // Long click - delete
+            // Long press exposes project actions.
             new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Delete Project")
-                    .setMessage("Delete \"" + project.getName() + "\" and all its files?")
-                    .setPositiveButton("Delete", (d, w) -> viewModel.deleteProject(project))
+                    .setTitle(project.getName())
+                    .setItems(new String[]{"Rename Project", "Delete Project"}, (d, which) -> {
+                        if (which == 0) {
+                            com.example.examprep.ui.RenameDialog.show(this, "Rename Project", project.getName(),
+                                    name -> com.example.examprep.data.cloud.CloudSync.renameProject(
+                                            requireContext(), homeOwnerUid, project.getId(), name),
+                                    () -> android.widget.Toast.makeText(requireContext(), "Project renamed.", android.widget.Toast.LENGTH_SHORT).show());
+                        } else {
+                            new MaterialAlertDialogBuilder(requireContext()).setTitle("Delete Project")
+                                    .setMessage("Delete \"" + project.getName() + "\" and all its files?")
+                                    .setPositiveButton("Delete", (ignored, w) -> viewModel.deleteProject(project))
+                                    .setNegativeButton("Cancel", null).show();
+                        }
+                    })
                     .setNegativeButton("Cancel", null)
                     .show();
         });
