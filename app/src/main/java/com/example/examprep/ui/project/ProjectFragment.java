@@ -246,28 +246,21 @@ public class ProjectFragment extends Fragment {
         refreshLatestSlidesCard();
         refreshLatestVideoCard();
 
-        btnOpenGuide.setOnClickListener(v -> openPdf(currentPdfFile));
-        btnShareGuide.setOnClickListener(v -> sharePdf(currentPdfFile));
+        btnOpenGuide.setOnClickListener(v -> showGeneratedItems("guide", GeneratedAction.OPEN));
+        btnShareGuide.setOnClickListener(v -> showGeneratedItems("guide", GeneratedAction.SHARE));
 
-        btnStartPractice.setOnClickListener(v -> {
-            if (currentExamQuiz != null) {
-                Intent intent = new Intent(requireContext(), ExamPracticeActivity.class);
-                intent.putExtra(ExamPracticeActivity.EXTRA_QUIZ, currentExamQuiz);
-                startActivity(intent);
-            } else {
-                Toast.makeText(requireContext(), "No exam quiz data loaded yet", Toast.LENGTH_SHORT).show();
-            }
-        });
-        btnOpenExamPdf.setOnClickListener(v -> openPdf(currentExamPdfFile));
-        btnShareExamPdf.setOnClickListener(v -> sharePdf(currentExamPdfFile));
+        btnStartPractice.setOnClickListener(v -> showGeneratedItems("questions", GeneratedAction.OPEN));
+        btnOpenExamPdf.setOnClickListener(v -> showGeneratedItems("exam", GeneratedAction.OPEN));
+        btnShareExamPdf.setOnClickListener(v -> showGeneratedItems("exam", GeneratedAction.SHARE));
 
-        btnOpenSlides.setOnClickListener(v -> openPptx(currentPptxFile));
-        btnShareSlides.setOnClickListener(v -> sharePptx(currentPptxFile));
+        btnOpenSlides.setOnClickListener(v -> showGeneratedItems("slides", GeneratedAction.OPEN));
+        btnShareSlides.setOnClickListener(v -> showGeneratedItems("slides", GeneratedAction.SHARE));
 
-        btnPlayVideo.setOnClickListener(v -> playVideo(currentVideoFile));
-        btnShareVideo.setOnClickListener(v -> shareVideo(currentVideoFile));
+        btnPlayVideo.setOnClickListener(v -> showGeneratedItems("video", GeneratedAction.OPEN));
+        btnShareVideo.setOnClickListener(v -> showGeneratedItems("video", GeneratedAction.SHARE));
 
         view.findViewById(R.id.btn_manage_generated).setOnClickListener(v -> showGeneratedItems("all"));
+        view.findViewById(R.id.btn_open_generated).setOnClickListener(v -> showGeneratedItems("all", GeneratedAction.OPEN));
         view.findViewById(R.id.btn_restore_guide).setOnClickListener(v -> showRestoreGuides());
         view.findViewById(R.id.btn_restore_questions).setOnClickListener(v -> showRestoreContent(RestoreKind.QUESTIONS));
         view.findViewById(R.id.btn_restore_presentation).setOnClickListener(v -> showRestoreContent(RestoreKind.PRESENTATION));
@@ -360,6 +353,12 @@ public class ProjectFragment extends Fragment {
     }
 
     private void showGeneratedItems(String category) {
+        showGeneratedItems(category, GeneratedAction.DELETE);
+    }
+
+    private enum GeneratedAction { OPEN, SHARE, DELETE }
+
+    private void showGeneratedItems(String category, GeneratedAction action) {
         final View requestedView = getView();
         CARD_IO.execute(() -> {
             try {
@@ -373,10 +372,12 @@ public class ProjectFragment extends Fragment {
                             || ("video".equals(category) && name.endsWith(".mp4"));
                     if (matches) items.add(new GeneratedChoice(name, file.modified, file, 0));
                 }
-                if ("all".equals(category) || "exam".equals(category)) {
+                if (action != GeneratedAction.SHARE && ("all".equals(category) || "questions".equals(category)
+                        || ("exam".equals(category) && action == GeneratedAction.DELETE))) {
                     for (com.example.examprep.data.model.GenerationCache cache : generatedCacheDao.getQuestionSets(projectId)) {
                         if (cache.getResultJson() == null || cache.getResultJson().isEmpty()) continue;
                         ExamQuiz quiz = ExamQuiz.fromJson(cache.getResultJson());
+                        if (action != GeneratedAction.DELETE && quiz.getQuestions().isEmpty()) continue;
                         items.add(new GeneratedChoice("Question set: " + quiz.getExamTitle()
                                 + " (" + quiz.getQuestions().size() + " questions)",
                                 cache.getCreatedAt().getTime(), null, cache.getId()));
@@ -391,6 +392,10 @@ public class ProjectFragment extends Fragment {
                     }
                     View picker = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_generated_items, null);
                     TextView count = picker.findViewById(R.id.text_generated_count);
+                    TextView hint = picker.findViewById(R.id.text_generated_hint);
+                    hint.setText(action == GeneratedAction.DELETE ? getString(R.string.generated_delete_hint)
+                            : action == GeneratedAction.SHARE ? "Choose the saved file you want to share."
+                            : "Choose a saved item to open. Question sets open in practice mode.");
                     count.setText(getResources().getQuantityString(R.plurals.generated_saved_items, items.size(), items.size()));
                     RecyclerView list = picker.findViewById(R.id.recycler_generated_items);
                     list.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -398,12 +403,15 @@ public class ProjectFragment extends Fragment {
                     int maxHeight = (int) Math.min(460 * density, getResources().getDisplayMetrics().heightPixels * 0.45f);
                     list.getLayoutParams().height = Math.min(maxHeight, (int) (items.size() * 230 * density));
                     AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Select an Item to Delete")
+                            .setTitle(action == GeneratedAction.DELETE ? "Select an Item to Delete"
+                                    : action == GeneratedAction.SHARE ? "Choose an Item to Share"
+                                    : "questions".equals(category) ? "Choose Questions to Practice" : "Choose an Item to Open")
                             .setView(picker)
                             .setNegativeButton("Close", null).create();
-                    list.setAdapter(new GeneratedDeleteAdapter(items, item -> {
+                    list.setAdapter(new GeneratedDeleteAdapter(items, action, item -> {
                         dialog.dismiss();
-                        confirmGeneratedDeletion(item, category);
+                        if (action == GeneratedAction.DELETE) confirmGeneratedDeletion(item, category);
+                        else openGeneratedChoice(item, action, requestedView);
                     }));
                     dialog.show();
                     generationDialogs.add(dialog);
@@ -412,8 +420,47 @@ public class ProjectFragment extends Fragment {
             } catch (Exception error) {
                 uiHandler.post(() -> {
                     if (canShowGeneratedItems(requestedView)) {
-                        Toast.makeText(requireContext(), "Could not load generated items: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Could not load saved items. Please try again.", Toast.LENGTH_LONG).show();
                     }
+                });
+            }
+        });
+    }
+
+    private void openGeneratedChoice(GeneratedChoice item, GeneratedAction action, View requestedView) {
+        CARD_IO.execute(() -> {
+            try {
+                if (!generatedOwnerUid.equals(com.example.examprep.util.UserPaths.currentUid())) return;
+                File selectedFile = item.file != null ? generatedFiles.resolve(item.file) : null;
+                ExamQuiz selectedQuiz = null;
+                if (selectedFile == null) {
+                    com.example.examprep.data.model.GenerationCache cache =
+                            generatedCacheDao.getQuestionSet(projectId, item.questionSetId);
+                    if (cache == null || cache.getResultJson() == null)
+                        throw new IllegalStateException("Question set no longer exists");
+                    selectedQuiz = ExamQuiz.fromJson(cache.getResultJson());
+                    if (selectedQuiz.getQuestions().isEmpty()) throw new IllegalStateException("Question set is empty");
+                }
+                final ExamQuiz quiz = selectedQuiz;
+                uiHandler.post(() -> {
+                    if (!canShowGeneratedItems(requestedView)) return;
+                    if (quiz != null) {
+                        Intent intent = new Intent(requireContext(), ExamPracticeActivity.class);
+                        intent.putExtra(ExamPracticeActivity.EXTRA_QUIZ, quiz);
+                        startActivity(intent);
+                    } else if (selectedFile.getName().endsWith(".mp4")) {
+                        if (action == GeneratedAction.SHARE) shareVideo(selectedFile); else playVideo(selectedFile);
+                    } else if (selectedFile.getName().endsWith(".pptx")) {
+                        if (action == GeneratedAction.SHARE) sharePptx(selectedFile); else openPptx(selectedFile);
+                    } else {
+                        if (action == GeneratedAction.SHARE) sharePdf(selectedFile); else openPdf(selectedFile);
+                    }
+                });
+            } catch (Exception error) {
+                android.util.Log.w("ProjectFragment", "Could not open selected item", error);
+                uiHandler.post(() -> {
+                    if (canShowGeneratedItems(requestedView)) Toast.makeText(requireContext(),
+                            "This item is no longer available. Reopen the list and try again.", Toast.LENGTH_LONG).show();
                 });
             }
         });
@@ -421,10 +468,12 @@ public class ProjectFragment extends Fragment {
 
     private static final class GeneratedDeleteAdapter extends RecyclerView.Adapter<GeneratedDeleteAdapter.Holder> {
         private final java.util.List<GeneratedChoice> items;
+        private final GeneratedAction action;
         private final java.util.function.Consumer<GeneratedChoice> onDelete;
-        GeneratedDeleteAdapter(java.util.List<GeneratedChoice> items,
+        GeneratedDeleteAdapter(java.util.List<GeneratedChoice> items, GeneratedAction action,
                 java.util.function.Consumer<GeneratedChoice> onDelete) {
             this.items = items;
+            this.action = action;
             this.onDelete = onDelete;
         }
         static final class Holder extends RecyclerView.ViewHolder {
@@ -466,7 +515,17 @@ public class ProjectFragment extends Fragment {
             String details = new SimpleDateFormat("MMM d, yyyy · HH:mm:ss", Locale.getDefault()).format(new Date(item.when));
             if (item.file != null) details += "  •  " + android.text.format.Formatter.formatShortFileSize(context, item.file.size);
             holder.meta.setText(details);
-            holder.delete.setContentDescription("Delete " + item.label);
+            String verb = action == GeneratedAction.DELETE ? "Delete"
+                    : action == GeneratedAction.SHARE ? "Share"
+                    : item.file == null ? "Practice" : item.label.endsWith(".mp4") ? "Play" : "Open";
+            holder.delete.setText(verb);
+            holder.delete.setContentDescription(verb + " " + item.label);
+            if (action != GeneratedAction.DELETE) {
+                holder.delete.setIcon(null);
+                holder.delete.setTextColor(context.getColor(R.color.primary));
+                holder.delete.setStrokeColor(android.content.res.ColorStateList.valueOf(context.getColor(R.color.primary)));
+                holder.delete.setBackgroundTintList(android.content.res.ColorStateList.valueOf(context.getColor(R.color.primary_container)));
+            }
             holder.delete.setOnClickListener(view -> onDelete.accept(item));
         }
         @Override public int getItemCount() { return items.size(); }

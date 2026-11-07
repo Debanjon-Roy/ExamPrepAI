@@ -529,10 +529,18 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_manage_generated"
+            android:id="@+id/btn_open_generated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:text="Open Generated Items"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_manage_generated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Manage Generated Items"
             style="@style/Widget.ExamPrep.Button.Outlined" />
 
