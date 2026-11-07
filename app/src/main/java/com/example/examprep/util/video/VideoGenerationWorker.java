@@ -51,6 +51,7 @@ public class VideoGenerationWorker extends Worker {
     public static final String KEY_PROJECT_ID = "project_id";
     public static final String KEY_LANGUAGE = "language";
     public static final String KEY_DETAIL_LEVEL = "detail_level";
+    public static final String KEY_USE_SAVED_DECK = "use_saved_deck";
     public static final String KEY_OUTPUT_VIDEO_PATH = "output_video_path";
     public static final String KEY_ERROR = "error";
 
@@ -98,11 +99,14 @@ public class VideoGenerationWorker extends Worker {
         List<SlideshowVideoEncoder.SlideMedia> slideMediaList = new ArrayList<>();
         try {
             // 1. Fetch or generate presentation slide outline
-            updateProgressNotification("Generating slide outline and narration scripts with ChatGPT...", 15);
+            updateProgressNotification(getInputData().getBoolean(KEY_USE_SAVED_DECK, false)
+                    ? "Loading saved slides and narration scripts..."
+                    : "Preparing slide outline and narration scripts...", 15);
             PresentationDeck deck = fetchOrGenerateDeck(projectId, project, language, detailLevel);
             if (deck == null || deck.getSlides().isEmpty()) {
                 return Result.failure();
             }
+            language = deck.getLanguage();
 
             // 2. Initialize TextToSpeech engine
             updateProgressNotification("Initializing speech synthesizer...", 25);
@@ -215,7 +219,15 @@ public class VideoGenerationWorker extends Worker {
         AppDatabase db = ownerDatabase;
         GenerationCache cached = db.generationCacheDao().getLatestCachedResult(projectId, "presentation_outline");
         if (cached != null && cached.getResultJson() != null) {
+            String json = cached.getResultJson();
+            com.example.examprep.data.cloud.RestoredPresentation.verifyJson(json);
+            com.example.examprep.data.cloud.StudyGuideBackup.savePresentation(ownerUid, projectId,
+                    project.getName(), PresentationDeck.fromJson(json).getLanguage(), json, null);
             return PresentationDeck.fromJson(cached.getResultJson());
+        }
+
+        if (getInputData().getBoolean(KEY_USE_SAVED_DECK, false)) {
+            throw new java.io.IOException("No saved slides found. Restore a presentation first.");
         }
 
         // Build deck with AI
@@ -273,6 +285,7 @@ public class VideoGenerationWorker extends Worker {
         }
 
         String cleanedJson = JsonCleaner.cleanAndValidateJson(resp.getContent());
+        com.example.examprep.data.cloud.RestoredPresentation.verifyJson(cleanedJson);
 
         // Cache in Room
         GenerationCache entry = new GenerationCache(
@@ -286,6 +299,9 @@ public class VideoGenerationWorker extends Worker {
         entry.setCostUsd(resp.getTokenUsage().getCostUsd());
         entry.setCreatedAt(new Date());
         db.generationCacheDao().insert(entry);
+
+        com.example.examprep.data.cloud.StudyGuideBackup.savePresentation(ownerUid, projectId,
+                project.getName(), language, cleanedJson, null);
 
         return PresentationDeck.fromJson(cleanedJson);
     }
