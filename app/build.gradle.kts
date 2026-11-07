@@ -78,6 +78,7 @@ dependencies {
 
     // Room
     implementation(libs.room.runtime)
+    implementation(libs.firebase.database)
     annotationProcessor(libs.room.compiler)
 
     // WorkManager

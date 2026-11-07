@@ -24,6 +24,8 @@ fragment = "1.8.5"
 cardview = "1.0.0"
 preference = "1.2.1"
 swiperefreshlayout = "1.1.0"
+firebaseFirestore = "27.1.0"
+firebaseDatabase = "23.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -81,6 +83,8 @@ media3-transformer = { group = "androidx.media3", name = "media3-transformer", v
 media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
 media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref = "media3" }
 media3-muxer = { group = "androidx.media3", name = "media3-muxer", version.ref = "media3" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
