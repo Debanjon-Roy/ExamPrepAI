@@ -68,6 +68,10 @@ public class ProjectFragment extends Fragment {
     private Uri pendingCameraUri;
     private File pendingCameraFile;
     private GenerationManager generationManager;
+    private com.example.examprep.util.GeneratedFiles generatedFiles;
+    private com.example.examprep.data.db.GenerationCacheDao generatedCacheDao;
+    private String generatedOwnerUid;
+    private int outputRevision;
     private static final java.util.concurrent.ExecutorService CARD_IO = java.util.concurrent.Executors.newFixedThreadPool(2);
     private final android.os.Handler uiHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private final java.util.List<AlertDialog> generationDialogs = new java.util.ArrayList<>();
@@ -101,6 +105,10 @@ public class ProjectFragment extends Fragment {
         }
 
         generationManager = new GenerationManager(requireContext());
+        generatedOwnerUid = com.example.examprep.util.UserPaths.currentUid();
+        generatedFiles = new com.example.examprep.util.GeneratedFiles(
+                com.example.examprep.util.UserPaths.filesDir(requireContext()), projectId);
+        generatedCacheDao = com.example.examprep.ExamPrepApp.getInstance().getDatabase().generationCacheDao();
 
         // 1. SAF file picker launcher (multi-select)
         filePickerLauncher = registerForActivityResult(
@@ -259,6 +267,11 @@ public class ProjectFragment extends Fragment {
         btnPlayVideo.setOnClickListener(v -> playVideo(currentVideoFile));
         btnShareVideo.setOnClickListener(v -> shareVideo(currentVideoFile));
 
+        view.findViewById(R.id.btn_manage_generated).setOnClickListener(v -> showGeneratedItems("all"));
+        view.findViewById(R.id.btn_delete_guide).setOnClickListener(v -> showGeneratedItems("guide"));
+        view.findViewById(R.id.btn_delete_exam).setOnClickListener(v -> showGeneratedItems("exam"));
+        view.findViewById(R.id.btn_delete_slides).setOnClickListener(v -> showGeneratedItems("slides"));
+        view.findViewById(R.id.btn_delete_video).setOnClickListener(v -> showGeneratedItems("video"));
         btnAddFiles.setOnClickListener(v -> showAddMaterialsDialog());
 
         SecurePrefs securePrefs = new SecurePrefs(requireContext());
@@ -312,13 +325,123 @@ public class ProjectFragment extends Fragment {
         super.onDestroyView();
     }
 
+    private static final class GeneratedChoice {
+        final String label;
+        final long when;
+        final com.example.examprep.util.GeneratedFiles.Item file;
+        final long questionSetId;
+        GeneratedChoice(String label, long when, com.example.examprep.util.GeneratedFiles.Item file, long questionSetId) {
+            this.label = label;
+            this.when = when;
+            this.file = file;
+            this.questionSetId = questionSetId;
+        }
+    }
+
+    private boolean canShowGeneratedItems(View requestedView) {
+        return isAdded() && requestedView != null && requestedView == getView()
+                && generatedOwnerUid.equals(com.example.examprep.util.UserPaths.currentUid());
+    }
+
+    private void showGeneratedItems(String category) {
+        final View requestedView = getView();
+        CARD_IO.execute(() -> {
+            try {
+                java.util.List<GeneratedChoice> items = new java.util.ArrayList<>();
+                for (com.example.examprep.util.GeneratedFiles.Item file : generatedFiles.list()) {
+                    String name = file.file.getName();
+                    boolean matches = "all".equals(category)
+                            || ("guide".equals(category) && name.startsWith("StudyGuide_"))
+                            || ("exam".equals(category) && name.startsWith("ExamPractice_"))
+                            || ("slides".equals(category) && name.endsWith(".pptx"))
+                            || ("video".equals(category) && name.endsWith(".mp4"));
+                    if (matches) items.add(new GeneratedChoice(name, file.modified, file, 0));
+                }
+                if ("all".equals(category) || "exam".equals(category)) {
+                    for (com.example.examprep.data.model.GenerationCache cache : generatedCacheDao.getQuestionSets(projectId)) {
+                        if (cache.getResultJson() == null || cache.getResultJson().isEmpty()) continue;
+                        ExamQuiz quiz = ExamQuiz.fromJson(cache.getResultJson());
+                        items.add(new GeneratedChoice("Question set: " + quiz.getExamTitle()
+                                + " (" + quiz.getQuestions().size() + " questions)",
+                                cache.getCreatedAt().getTime(), null, cache.getId()));
+                    }
+                }
+                items.sort(java.util.Comparator.comparingLong((GeneratedChoice item) -> item.when).reversed());
+                uiHandler.post(() -> {
+                    if (!canShowGeneratedItems(requestedView)) return;
+                    if (items.isEmpty()) {
+                        Toast.makeText(requireContext(), "No saved items in this category.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    CharSequence[] labels = new CharSequence[items.size()];
+                    SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.getDefault());
+                    for (int i = 0; i < labels.length; i++) {
+                        GeneratedChoice item = items.get(i);
+                        labels[i] = item.label + "\n" + format.format(new Date(item.when));
+                    }
+                    AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Select an Item to Delete")
+                            .setItems(labels, (ignored, which) -> confirmGeneratedDeletion(items.get(which), category))
+                            .setNegativeButton("Close", null).show();
+                    generationDialogs.add(dialog);
+                    dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
+                });
+            } catch (Exception error) {
+                uiHandler.post(() -> {
+                    if (canShowGeneratedItems(requestedView)) {
+                        Toast.makeText(requireContext(), "Could not load generated items: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void confirmGeneratedDeletion(GeneratedChoice item, String category) {
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete Generated Item?")
+                .setMessage(item.label + "\n\nThis deletes only the selected saved item. Your project and source materials are kept.")
+                .setPositiveButton("Delete", (ignored, which) -> {
+                    View requestedView = getView();
+                    CARD_IO.execute(() -> {
+                        try {
+                            if (item.file != null) generatedFiles.delete(item.file);
+                            else generatedCacheDao.deleteQuestionSet(projectId, item.questionSetId);
+                            uiHandler.post(() -> {
+                                if (!canShowGeneratedItems(requestedView)) return;
+                                outputRevision++; // Ignore refresh callbacks queued before this deletion.
+                                currentPdfFile = null;
+                                currentExamPdfFile = null;
+                                currentExamQuiz = null;
+                                currentPptxFile = null;
+                                currentVideoFile = null;
+                                refreshLatestPdfCard();
+                                refreshLatestExamCard();
+                                refreshLatestSlidesCard();
+                                refreshLatestVideoCard();
+                                Toast.makeText(requireContext(), "Item deleted.", Toast.LENGTH_SHORT).show();
+                                showGeneratedItems(category);
+                            });
+                        } catch (Exception error) {
+                            uiHandler.post(() -> {
+                                if (canShowGeneratedItems(requestedView)) {
+                                    Toast.makeText(requireContext(), "Could not delete item: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                }).setNegativeButton("Cancel", null).show();
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
+    }
+
     private void refreshLatestPdfCard() {
         final View requestedView = getView();
+        final int revision = outputRevision;
         CARD_IO.execute(() -> {
             try {
                 File pdf = generationManager.getLatestGeneratedPdf(projectId);
                 uiHandler.post(() -> {
-                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
+                    if (!isAdded() || requestedView == null || getView() != requestedView || revision != outputRevision) return;
                     currentPdfFile = pdf;
                     if (cardLatestGuide != null) {
                         if (currentPdfFile != null && currentPdfFile.exists()) {
@@ -341,15 +464,21 @@ public class ProjectFragment extends Fragment {
 
     private void refreshLatestExamCard() {
         final View requestedView = getView();
+        final int revision = outputRevision;
         CARD_IO.execute(() -> {
             try {
                 File pdf = generationManager.getLatestExamPdf(projectId);
                 ExamQuiz quiz = generationManager.getLatestExamQuiz(projectId);
 
                 uiHandler.post(() -> {
-                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
+                    if (!isAdded() || requestedView == null || getView() != requestedView || revision != outputRevision) return;
                     currentExamPdfFile = pdf;
                     currentExamQuiz = quiz;
+                    requestedView.findViewById(R.id.btn_start_practice)
+                            .setEnabled(quiz != null && !quiz.getQuestions().isEmpty());
+                    boolean hasPdf = pdf != null && pdf.exists();
+                    requestedView.findViewById(R.id.btn_open_exam_pdf).setEnabled(hasPdf);
+                    requestedView.findViewById(R.id.btn_share_exam_pdf).setEnabled(hasPdf);
 
                     if (cardLatestExam == null) return;
 
@@ -389,19 +518,20 @@ public class ProjectFragment extends Fragment {
 
     private void refreshLatestSlidesCard() {
         final View requestedView = getView();
+        final int revision = outputRevision;
         CARD_IO.execute(() -> {
             try {
                 File pptx = generationManager.getLatestPresentationFile(projectId);
                 PresentationDeck deck = generationManager.getLatestPresentationDeck(projectId);
 
                 uiHandler.post(() -> {
-                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
+                    if (!isAdded() || requestedView == null || getView() != requestedView || revision != outputRevision) return;
                     currentPptxFile = pptx;
                     currentPresentationDeck = deck;
 
                     if (cardLatestSlides == null) return;
 
-                    if (currentPresentationDeck != null) {
+                    if (currentPresentationDeck != null && pptx != null && pptx.exists()) {
                         cardLatestSlides.setVisibility(View.VISIBLE);
                         if (textSlidesTitle != null) {
                             if (currentPresentationDeck.getPresentationTitle() != null && !currentPresentationDeck.getPresentationTitle().isEmpty()) {
@@ -436,12 +566,13 @@ public class ProjectFragment extends Fragment {
 
     private void refreshLatestVideoCard() {
         final View requestedView = getView();
+        final int revision = outputRevision;
         CARD_IO.execute(() -> {
             try {
                 File video = generationManager.getLatestVideoFile(projectId);
 
                 uiHandler.post(() -> {
-                    if (!isAdded() || requestedView == null || getView() != requestedView) return;
+                    if (!isAdded() || requestedView == null || getView() != requestedView || revision != outputRevision) return;
                     currentVideoFile = video;
                     if (cardLatestVideo == null) return;
 

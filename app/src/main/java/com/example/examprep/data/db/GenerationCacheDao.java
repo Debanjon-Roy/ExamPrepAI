@@ -19,6 +19,12 @@ public interface GenerationCacheDao {
     @Query("SELECT * FROM generation_cache WHERE projectId = :projectId AND generationType = :type ORDER BY createdAt DESC LIMIT 1")
     GenerationCache getLatestCachedResult(long projectId, String type);
 
+    @Query("SELECT * FROM generation_cache WHERE projectId = :projectId AND generationType = 'exam_questions' ORDER BY createdAt DESC, id DESC")
+    java.util.List<GenerationCache> getQuestionSets(long projectId);
+
+    @Query("DELETE FROM generation_cache WHERE projectId = :projectId AND id = :id AND generationType = 'exam_questions'")
+    int deleteQuestionSet(long projectId, long id);
+
     @Query("DELETE FROM generation_cache WHERE projectId = :projectId AND generationType = :type")
     void deleteCacheByType(long projectId, String type);
 

@@ -207,6 +207,15 @@
                         android:text="Share"
                         style="@style/Widget.ExamPrep.Button.Outlined" />
                 </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Delete a PDF"
+                    android:textColor="@color/error"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -305,6 +314,15 @@
                         android:text="Share PDF"
                         style="@style/Widget.ExamPrep.Button.Outlined" />
                 </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_exam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Delete Questions or PDF"
+                    android:textColor="@color/error"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -393,6 +411,15 @@
                         android:text="Share"
                         style="@style/Widget.ExamPrep.Button.Outlined" />
                 </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_slides"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Delete a Presentation"
+                    android:textColor="@color/error"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -481,8 +508,25 @@
                         android:text="Share Video"
                         style="@style/Widget.ExamPrep.Button.Outlined" />
                 </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Delete a Video"
+                    android:textColor="@color/error"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_manage_generated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Manage Generated Items"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
 
         <!-- 6. Study Materials Card -->
         <com.google.android.material.card.MaterialCardView
