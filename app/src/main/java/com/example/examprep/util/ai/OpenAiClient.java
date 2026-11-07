@@ -228,11 +228,40 @@ public class OpenAiClient implements AiProvider {
         void onError(String errorMessage, Throwable throwable);
     }
 
-    private void executeRequest(JsonObject payloadJson, InternalCallback callback) {
+    /** Ordinary multi-turn text/vision chat; project generation keeps its JSON mode. */
+    public Call generateChatReply(JsonArray messages, Callback callback) {
+        if (!securePrefs.hasApiKey()) {
+            postError(callback, "Add your OpenAI API key in Settings to chat with your buddy.", null);
+            return null;
+        }
+        if (securePrefs.isDailyCapReached()) {
+            postError(callback, "Your daily spending limit has been reached. You can adjust it in Settings.", null);
+            return null;
+        }
+        JsonObject payload = new JsonObject();
+        payload.addProperty("model", MODEL);
+        payload.addProperty("max_tokens", MAX_TOKENS);
+        payload.addProperty("temperature", 0.3);
+        payload.addProperty("store", false);
+        payload.add("messages", messages);
+        return executeRequest(payload, new InternalCallback() {
+            @Override public void onSuccess(String text, TokenUsage usage) {
+                recordCost(usage);
+                if (text == null || text.trim().isEmpty()) {
+                    postError(callback, "The buddy returned an empty answer. Please retry.", null);
+                } else {
+                    postSuccess(callback, new AiResponse(text.trim(), usage, false));
+                }
+            }
+            @Override public void onError(String message, Throwable error) { postError(callback, message, error); }
+        });
+    }
+
+    private Call executeRequest(JsonObject payloadJson, InternalCallback callback) {
         String apiKey = securePrefs.getApiKey();
         if (apiKey == null || apiKey.isEmpty()) {
             callback.onError("ChatGPT API key is missing. Please add it in Settings.", null);
-            return;
+            return null;
         }
 
         RequestBody body = RequestBody.create(payloadJson.toString(), JSON_MEDIA_TYPE);
@@ -244,7 +273,8 @@ public class OpenAiClient implements AiProvider {
                 .post(body)
                 .build();
 
-        httpClient.newCall(request).enqueue(new okhttp3.Callback() {
+        Call call = httpClient.newCall(request);
+        call.enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 callback.onError("Network connection failure: " + e.getMessage(), e);
@@ -289,6 +319,7 @@ public class OpenAiClient implements AiProvider {
                 }
             }
         });
+        return call;
     }
 
     private TokenUsage parseUsage(JsonObject resJson) {

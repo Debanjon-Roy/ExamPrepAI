@@ -41,6 +41,8 @@
         </activity>
 
         <!-- Main Activity (requires login) -->
+        <activity android:name=".ui.WorkspaceActivity" android:exported="false" />
+        <activity android:name=".ui.buddy.BuddyActivity" android:exported="false" android:launchMode="singleTop" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="false"

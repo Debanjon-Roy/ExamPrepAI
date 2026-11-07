@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Firestore and the buddy sync serializer use these public field names.
+-keep class com.example.examprep.data.buddy.BuddyThread { public *; }
+-keep class com.example.examprep.data.buddy.BuddyMessage { public *; }
+-keep class com.example.examprep.data.buddy.BuddyMaterial { public *; }

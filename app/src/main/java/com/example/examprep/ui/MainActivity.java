@@ -390,6 +390,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_workspace) {
+            startActivity(new Intent(this, WorkspaceActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+            finish();
+            return true;
+        }
         if (item.getItemId() == R.id.action_logout) {
             confirmLogout();
             return true;
