@@ -373,16 +373,23 @@ public class ProjectFragment extends Fragment {
                         Toast.makeText(requireContext(), "No saved items in this category.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    CharSequence[] labels = new CharSequence[items.size()];
-                    SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.getDefault());
-                    for (int i = 0; i < labels.length; i++) {
-                        GeneratedChoice item = items.get(i);
-                        labels[i] = item.label + "\n" + format.format(new Date(item.when));
-                    }
+                    View picker = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_generated_items, null);
+                    TextView count = picker.findViewById(R.id.text_generated_count);
+                    count.setText(getResources().getQuantityString(R.plurals.generated_saved_items, items.size(), items.size()));
+                    RecyclerView list = picker.findViewById(R.id.recycler_generated_items);
+                    list.setLayoutManager(new LinearLayoutManager(requireContext()));
+                    float density = getResources().getDisplayMetrics().density;
+                    int maxHeight = (int) Math.min(460 * density, getResources().getDisplayMetrics().heightPixels * 0.45f);
+                    list.getLayoutParams().height = Math.min(maxHeight, (int) (items.size() * 230 * density));
                     AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Select an Item to Delete")
-                            .setItems(labels, (ignored, which) -> confirmGeneratedDeletion(items.get(which), category))
-                            .setNegativeButton("Close", null).show();
+                            .setView(picker)
+                            .setNegativeButton("Close", null).create();
+                    list.setAdapter(new GeneratedDeleteAdapter(items, item -> {
+                        dialog.dismiss();
+                        confirmGeneratedDeletion(item, category);
+                    }));
+                    dialog.show();
                     generationDialogs.add(dialog);
                     dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
                 });
@@ -394,6 +401,59 @@ public class ProjectFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private static final class GeneratedDeleteAdapter extends RecyclerView.Adapter<GeneratedDeleteAdapter.Holder> {
+        private final java.util.List<GeneratedChoice> items;
+        private final java.util.function.Consumer<GeneratedChoice> onDelete;
+        GeneratedDeleteAdapter(java.util.List<GeneratedChoice> items,
+                java.util.function.Consumer<GeneratedChoice> onDelete) {
+            this.items = items;
+            this.onDelete = onDelete;
+        }
+        static final class Holder extends RecyclerView.ViewHolder {
+            final TextView type, name, meta;
+            final MaterialButton delete;
+            Holder(View view) {
+                super(view);
+                type = view.findViewById(R.id.text_generated_type);
+                name = view.findViewById(R.id.text_generated_name);
+                meta = view.findViewById(R.id.text_generated_meta);
+                delete = view.findViewById(R.id.btn_delete_generated_item);
+            }
+        }
+        @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_generated_delete, parent, false));
+        }
+        @Override public void onBindViewHolder(@NonNull Holder holder, int position) {
+            GeneratedChoice item = items.get(position);
+            android.content.Context context = holder.itemView.getContext();
+            String type = "Study guide PDF";
+            int background = R.color.badge_guide_bg, foreground = R.color.badge_guide_text;
+            if (item.file == null || item.label.startsWith("ExamPractice_")) {
+                type = item.file == null ? "Question set" : "Exam PDF";
+                background = R.color.badge_exam_bg;
+                foreground = R.color.badge_exam_text;
+            } else if (item.label.endsWith(".mp4")) {
+                type = "Video";
+                background = R.color.badge_video_bg;
+                foreground = R.color.badge_video_text;
+            } else if (item.label.endsWith(".pptx")) {
+                type = "Presentation";
+                background = R.color.badge_slides_bg;
+                foreground = R.color.badge_slides_text;
+            }
+            holder.type.setText(type);
+            holder.type.setTextColor(context.getColor(foreground));
+            holder.type.setBackgroundTintList(android.content.res.ColorStateList.valueOf(context.getColor(background)));
+            holder.name.setText(item.label);
+            String details = new SimpleDateFormat("MMM d, yyyy · HH:mm:ss", Locale.getDefault()).format(new Date(item.when));
+            if (item.file != null) details += "  •  " + android.text.format.Formatter.formatShortFileSize(context, item.file.size);
+            holder.meta.setText(details);
+            holder.delete.setContentDescription("Delete " + item.label);
+            holder.delete.setOnClickListener(view -> onDelete.accept(item));
+        }
+        @Override public int getItemCount() { return items.size(); }
     }
 
     private void confirmGeneratedDeletion(GeneratedChoice item, String category) {

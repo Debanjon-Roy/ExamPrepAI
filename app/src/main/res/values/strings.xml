@@ -82,4 +82,10 @@
     <string name="logout_title">Log out?</string>
     <string name="logout_message">You will need to sign in with Google again to use the app.</string>
     <string name="about_me">About Me</string>
+    <string name="generated_delete_hint">Choose an item below. You’ll confirm before it is deleted.</string>
+    <string name="delete_generated_item">Delete item</string>
+    <plurals name="generated_saved_items">
+        <item quantity="one">%d saved item</item>
+        <item quantity="other">%d saved items</item>
+    </plurals>
 </resources>
