@@ -268,6 +268,7 @@ public class ProjectFragment extends Fragment {
         btnShareVideo.setOnClickListener(v -> shareVideo(currentVideoFile));
 
         view.findViewById(R.id.btn_manage_generated).setOnClickListener(v -> showGeneratedItems("all"));
+        view.findViewById(R.id.btn_restore_guide).setOnClickListener(v -> showRestoreGuides());
         view.findViewById(R.id.btn_delete_guide).setOnClickListener(v -> showGeneratedItems("guide"));
         view.findViewById(R.id.btn_delete_exam).setOnClickListener(v -> showGeneratedItems("exam"));
         view.findViewById(R.id.btn_delete_slides).setOnClickListener(v -> showGeneratedItems("slides"));
@@ -492,6 +493,92 @@ public class ProjectFragment extends Fragment {
                 }).setNegativeButton("Cancel", null).show();
         generationDialogs.add(dialog);
         dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
+    }
+
+    private void trackRestoreDialog(AlertDialog dialog) {
+        generationDialogs.add(dialog);
+        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
+    }
+
+    private boolean restoreViewActive(View original, String uid) {
+        return isAdded() && original != null && getView() == original
+                && uid.equals(com.example.examprep.util.UserPaths.currentUid());
+    }
+
+    private void showRestoreGuides() {
+        final View original = getView();
+        final String uid = generatedOwnerUid;
+        if (!restoreViewActive(original, uid)) return;
+        AlertDialog loading = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.restore_study_guide)
+                .setMessage("Looking for your backed-up study guides…")
+                .setNegativeButton("Cancel", null).show();
+        trackRestoreDialog(loading);
+        com.example.examprep.data.cloud.StudyGuideRestore.list(uid, projectId)
+                .addOnCompleteListener(task -> {
+                    if (!restoreViewActive(original, uid) || !loading.isShowing()) return;
+                    loading.dismiss();
+                    if (!task.isSuccessful()) {
+                        showRestoreError("Could not load backups. Check your connection and try again.");
+                        return;
+                    }
+                    java.util.List<com.example.examprep.data.cloud.StudyGuideRestore.Backup> backups = task.getResult();
+                    if (backups.isEmpty()) {
+                        showRestoreError("No study-guide backups found for this project. Generate a study-guide PDF with the updated app first.");
+                        return;
+                    }
+                    String[] labels = new String[backups.size()];
+                    for (int i = 0; i < labels.length; i++) {
+                        com.example.examprep.data.cloud.StudyGuideRestore.Backup b = backups.get(i);
+                        labels[i] = b.name + "\n" + ("bn".equals(b.language) ? "Bengali" : "English")
+                                + (b.date != null ? " • " + new SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(b.date) : "");
+                    }
+                    AlertDialog picker = new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Choose a study guide to restore")
+                            .setItems(labels, (d, which) -> restoreGuide(backups.get(which), original, uid))
+                            .setNegativeButton("Cancel", null).show();
+                    trackRestoreDialog(picker);
+                });
+    }
+
+    private void restoreGuide(com.example.examprep.data.cloud.StudyGuideRestore.Backup backup,
+                              View original, String uid) {
+        if (!restoreViewActive(original, uid)) return;
+        AlertDialog progress = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Restoring study guide")
+                .setMessage("Downloading saved content and rebuilding your PDF. No AI request is needed.")
+                .setNegativeButton("Close", null).show();
+        trackRestoreDialog(progress);
+        com.example.examprep.data.cloud.StudyGuideRestore.restore(requireContext(), uid,
+                projectId, "Study Guide", backup).addOnCompleteListener(task -> {
+                    if (!restoreViewActive(original, uid)) return;
+                    if (task.isSuccessful()) {
+                        outputRevision++;
+                        refreshLatestPdfCard();
+                    }
+                    if (!progress.isShowing()) return;
+                    progress.dismiss();
+                    if (!task.isSuccessful()) {
+                        showRestoreError("Could not restore this backup. Check your connection and try again. "
+                                + (task.getException() != null && task.getException().getMessage() != null
+                                ? task.getException().getMessage() : ""));
+                        return;
+                    }
+                    File pdf = task.getResult();
+                    AlertDialog done = new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("PDF restored")
+                            .setMessage("Your study guide is saved on this device and ready to open.")
+                            .setPositiveButton("Open PDF", (d, w) -> openPdf(pdf))
+                            .setNegativeButton("Done", null).show();
+                    trackRestoreDialog(done);
+                });
+    }
+
+    private void showRestoreError(String message) {
+        AlertDialog error = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.restore_study_guide).setMessage(message)
+                .setPositiveButton("OK", null).show();
+        trackRestoreDialog(error);
     }
 
     private void refreshLatestPdfCard() {

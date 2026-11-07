@@ -528,6 +528,14 @@
             android:text="Manage Generated Items"
             style="@style/Widget.ExamPrep.Button.Outlined" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_restore_guide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/restore_study_guide"
+            style="@style/Widget.ExamPrep.Button.Outlined" />
+
         <!-- 6. Study Materials Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
