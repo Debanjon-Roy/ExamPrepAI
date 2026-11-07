@@ -31,8 +31,8 @@ import java.util.concurrent.Executors;
  *   users/{uid}                    -> profile (name, email, photo, createdAt, lastLoginAt)
  *   users/{uid}/projects/{id}      -> project metadata (name, description, language, ...)
  *
- * Uploaded files and generated PDFs/slides stay on the device (Firestore has a 1 MB
- * document limit), but they are stored in per-user folders, see UserPaths.
+ * Binary files stay in per-user folders, see UserPaths. Newly rendered study-guide
+ * source content is backed up separately by StudyGuideBackup under generatedContent.
  */
 public final class CloudSync {
 

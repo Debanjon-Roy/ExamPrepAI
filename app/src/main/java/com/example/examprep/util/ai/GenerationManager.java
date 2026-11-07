@@ -52,12 +52,14 @@ public class GenerationManager {
     private final AiProvider aiProvider;
     private final AppDatabase database;
     private final java.io.File ownerFilesDir;
+    private final String ownerUid;
     private static final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public GenerationManager(@NonNull Context context) {
         this.context = context.getApplicationContext();
         this.ownerFilesDir = UserPaths.filesDir(context);
+        this.ownerUid = UserPaths.currentUid();
         this.aiProvider = new OpenAiClient(context);
         this.database = ExamPrepApp.getInstance().getDatabase();
     }
@@ -242,6 +244,8 @@ public class GenerationManager {
                                 language, ownerFilesDir
                         );
 
+                        com.example.examprep.data.cloud.StudyGuideBackup.save(
+                                ownerUid, projectId, projectName, language, detailLevel, finalJson, pdfFile);
                         mainHandler.post(() -> callback.onSuccess(pdfFile, usage, fromCache));
                     } catch (Exception e) {
                         mainHandler.post(() -> callback.onError("Failed to render PDF: " + e.getMessage()));
