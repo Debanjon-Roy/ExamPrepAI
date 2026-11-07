@@ -64,6 +64,7 @@ public class ExamPracticeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_practice);
+        com.example.examprep.util.SystemBarInsets.apply(this);
 
         quiz = (ExamQuiz) getIntent().getSerializableExtra(EXTRA_QUIZ);
         if (quiz == null || quiz.getQuestions().isEmpty()) {

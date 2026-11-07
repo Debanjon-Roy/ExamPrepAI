@@ -81,4 +81,5 @@
     <string name="action_logout">Log out</string>
     <string name="logout_title">Log out?</string>
     <string name="logout_message">You will need to sign in with Google again to use the app.</string>
+    <string name="about_me">About Me</string>
 </resources>

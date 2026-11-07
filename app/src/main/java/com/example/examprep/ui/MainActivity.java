@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         CloudSync.onSignedIn(getApplicationContext());
 
         setContentView(R.layout.activity_main);
+        com.example.examprep.util.SystemBarInsets.apply(this);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);

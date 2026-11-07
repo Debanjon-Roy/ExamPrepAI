@@ -183,11 +183,10 @@ public class ProjectFragment extends Fragment {
         MaterialButton btnGenerateSlides = view.findViewById(R.id.btn_generate_slides);
         MaterialButton btnGenerateQuestions = view.findViewById(R.id.btn_generate_questions);
         MaterialButton btnGenerateVideo = view.findViewById(R.id.btn_generate_video);
-        MaterialButton btnTestAi = view.findViewById(R.id.btn_test_ai);
 
         recyclerFiles.setLayoutManager(new LinearLayoutManager(requireContext()));
         fileAdapter = new FileAdapter(
-                this::showFilePreviewDialog,
+                this::showFileDetailsDialog,
                 this::showDeleteFileDialog
         );
         recyclerFiles.setAdapter(fileAdapter);
@@ -271,15 +270,6 @@ public class ProjectFragment extends Fragment {
                 return;
             }
             showGenerateGuideOptionsDialog();
-        });
-
-        // Stage 3: Test AI Pipeline
-        btnTestAi.setOnClickListener(v -> {
-            if (!securePrefs.hasApiKey()) {
-                showMissingApiKeyDialog();
-                return;
-            }
-            runAiTestPipeline();
         });
 
         // Stage 6: Generate Presentation Slides (.pptx)
@@ -1053,110 +1043,6 @@ public class ProjectFragment extends Fragment {
                 });
     }
 
-    private void runAiTestPipeline() {
-        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_generation_progress, null);
-        TextView title = dialogView.findViewById(R.id.dialog_gen_title);
-        ProgressBar progressBar = dialogView.findViewById(R.id.dialog_gen_progress);
-        TextView status = dialogView.findViewById(R.id.dialog_gen_status);
-        LinearLayout resultsLayout = dialogView.findViewById(R.id.layout_gen_results);
-        TextView costBadge = dialogView.findViewById(R.id.dialog_gen_cost_badge);
-        TextView tokensText = dialogView.findViewById(R.id.dialog_gen_tokens);
-        TextView jsonView = dialogView.findViewById(R.id.dialog_gen_json);
-
-        title.setText("AI Pipeline Test");
-        status.setText("Initializing request to ChatGPT (GPT-4o mini)...");
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setView(dialogView)
-                .setPositiveButton("Close", null)
-                .setCancelable(false)
-                .show();
-        generationDialogs.add(dialog);
-        dialog.setOnDismissListener(ignored -> generationDialogs.remove(dialog));
-
-        List<ProjectFile> files = viewModel.getFiles().getValue();
-        boolean hasExtractedText = false;
-        if (files != null) {
-            for (ProjectFile f : files) {
-                if ((f.getExtractedText() != null && !f.getExtractedText().isEmpty())
-                        || (f.getOcrText() != null && !f.getOcrText().isEmpty())) {
-                    hasExtractedText = true;
-                    break;
-                }
-            }
-        }
-
-        if (hasExtractedText) {
-            String systemInstruction = "You are ExamForge. Analyze the uploaded study material and return strict JSON summarizing the content. Ground every point strictly in the provided material without hallucinating.";
-            String userPrompt = "Return a JSON object with this exact schema: {\"title\": \"Title\", \"total_topics\": 3, \"core_topics\": [\"topic1\", \"topic2\"], \"key_takeaways\": [\"point1\", \"point2\"], \"verification_status\": \"grounded\"}";
-
-            generationManager.generateOrFetch(projectId, "ai_test_summary", systemInstruction, userPrompt, new GenerationManager.GenerationCallback() {
-                @Override
-                public void onProgress(String message) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    status.setText(message);
-                }
-
-                @Override
-                public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    progressBar.setVisibility(View.GONE);
-                    status.setText(fromCache ? "✓ Loaded from local Room cache (zero cost)" : "✓ Live response received and validated");
-                    resultsLayout.setVisibility(View.VISIBLE);
-
-                    if (fromCache) {
-                        costBadge.setText("Local Cache: $0.00000 (Free)");
-                        tokensText.setText("0 network tokens used • Result cached in Room DB");
-                    } else {
-                        costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
-                        tokensText.setText(String.format("Tokens: %d in / %d out (Cache: %d read, %d write)",
-                                usage.getInputTokens(), usage.getOutputTokens(),
-                                usage.getCacheReadInputTokens(), usage.getCacheCreationInputTokens()));
-                    }
-
-                    jsonView.setText(resultJson);
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    progressBar.setVisibility(View.GONE);
-                    status.setText("Error: " + errorMessage);
-                    status.setTextColor(requireContext().getColor(R.color.error));
-                }
-            });
-        } else {
-            generationManager.testAiConnection(new GenerationManager.GenerationCallback() {
-                @Override
-                public void onProgress(String message) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    status.setText(message);
-                }
-
-                @Override
-                public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    progressBar.setVisibility(View.GONE);
-                    status.setText("✓ Connection to ChatGPT / OpenAI API successful!");
-                    resultsLayout.setVisibility(View.VISIBLE);
-
-                    costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
-                    tokensText.setText(String.format("Tokens: %d in / %d out",
-                            usage.getInputTokens(), usage.getOutputTokens()));
-                    jsonView.setText(resultJson);
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                if (!isAdded() || getView() == null || !dialog.isShowing()) return;
-                    progressBar.setVisibility(View.GONE);
-                    status.setText("Error: " + errorMessage);
-                    status.setTextColor(requireContext().getColor(R.color.error));
-                }
-            });
-        }
-    }
-
     private void showMissingApiKeyDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("ChatGPT API Key Required")
@@ -1230,13 +1116,12 @@ public class ProjectFragment extends Fragment {
         }
     }
 
-    private void showFilePreviewDialog(@NonNull ProjectFile file) {
+    private void showFileDetailsDialog(@NonNull ProjectFile file) {
         View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_file_preview, null);
 
         TextView title = view.findViewById(R.id.dialog_preview_title);
         TextView meta = view.findViewById(R.id.dialog_preview_meta);
         TextView stats = view.findViewById(R.id.dialog_preview_stats);
-        TextView content = view.findViewById(R.id.dialog_preview_content);
 
         title.setText(file.getFileName());
 
@@ -1246,17 +1131,7 @@ public class ProjectFragment extends Fragment {
                 : String.format("%.1f MB", size / (1024.0 * 1024.0));
         meta.setText(String.format("Format: %s • Size: %s", file.getMimeType(), sizeStr));
 
-        String effectiveText = file.getExtractedText() != null ? file.getExtractedText() : file.getOcrText();
-        if (effectiveText != null && !effectiveText.isEmpty()) {
-            int chars = effectiveText.length();
-            int words = effectiveText.split("\\s+").length;
-            String type = file.getOcrText() != null ? "On-Device OCR" : "Text Stripper";
-            stats.setText(String.format("✓ %s: %d words • %,d characters", type, words, chars));
-            content.setText(effectiveText);
-        } else {
-            stats.setText("Status: " + file.getTextExtractionStatus());
-            content.setText("[No text extracted yet or extraction failed]");
-        }
+        stats.setText("Status: " + file.getTextExtractionStatus());
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)

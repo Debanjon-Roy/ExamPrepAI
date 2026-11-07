@@ -637,23 +637,6 @@
                     style="@style/Widget.ExamPrep.Button.Outlined"
                     android:layout_marginTop="10dp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginBottom="10dp" />
-
-                <!-- 5. Test AI Pipeline -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_test_ai"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="⚡ Test AI Pipeline &amp; Cost Tracker"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:textColor="@color/primary"
-                    android:textStyle="bold" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -50,6 +50,7 @@ public class WelcomeActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_welcome);
+        com.example.examprep.util.SystemBarInsets.apply(this);
         credentialManager = CredentialManager.create(this);
         btnGoogle = findViewById(R.id.btn_google_sign_in);
         progress = findViewById(R.id.progress_sign_in);
