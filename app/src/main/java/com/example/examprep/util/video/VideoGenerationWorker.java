@@ -181,7 +181,7 @@ public class VideoGenerationWorker extends Worker {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
             finalVideoFile = new File(outputDir, "ExamForge_Video_" + timestamp + ".mp4");
 
-            updateProgressNotification("Encoding 720p HD MP4 video with hardware MediaCodec...", 75);
+            updateProgressNotification("Preparing your HD video...", 75);
 
             SlideshowVideoEncoder.encodeSlideshow(slideMediaList, finalVideoFile, (currentSlide, total, status) -> {
                 int percent;
@@ -201,7 +201,7 @@ public class VideoGenerationWorker extends Worker {
 
         } catch (Exception e) {
             android.util.Log.e("VideoGenerationWorker", "Video production failed", e);
-            String message = e.getMessage() != null ? e.getMessage() : "The device could not encode this video.";
+            String message = "Could not finish creating the video. Please try again.";
             if (!isStopped()) postFailureNotification(message);
             return Result.failure(new Data.Builder().putString(KEY_ERROR, message).build());
         } finally {

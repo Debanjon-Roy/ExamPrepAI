@@ -129,7 +129,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 String masked = "••••••••" + key.substring(Math.max(0, key.length() - 4));
                 apiKeyPref.setSummary("Set: " + masked);
             } else {
-                apiKeyPref.setSummary("Not set — tap to enter your ChatGPT (OpenAI) API key");
+                apiKeyPref.setSummary("Not set — tap to enter your OpenAI API key");
             }
         }
     }

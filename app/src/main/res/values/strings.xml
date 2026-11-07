@@ -9,8 +9,8 @@
     <string name="pref_api_key">api_key</string>
     <string name="pref_daily_cap">daily_cap</string>
     <string name="pref_language">language</string>
-    <string name="settings_api_key_title">ChatGPT / OpenAI API Key</string>
-    <string name="settings_api_key_summary">Paste your ChatGPT (OpenAI) API key</string>
+    <string name="settings_api_key_title">OpenAI API Key</string>
+    <string name="settings_api_key_summary">Enter your OpenAI API key</string>
     <string name="settings_daily_cap_title">Daily Spending Cap (USD)</string>
     <string name="settings_daily_cap_summary">Stop AI requests when this amount is reached today</string>
     <string name="settings_daily_cap_default">1.00</string>

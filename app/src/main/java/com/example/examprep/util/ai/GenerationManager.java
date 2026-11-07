@@ -72,7 +72,7 @@ public class GenerationManager {
             @NonNull GenerationCallback callback
     ) {
         executor.execute(() -> {
-            postProgress(callback, "Checking local database cache...");
+            postProgress(callback, "Checking for a saved result...");
 
             // 1. Load project and all extracted text
             Project project = database.projectDao().getProjectByIdSync(projectId);
@@ -106,7 +106,7 @@ public class GenerationManager {
             GenerationCache cached = cacheDao.getCachedResult(projectId, generationType, inputHash);
 
             if (cached != null && cached.getResultJson() != null && !cached.getResultJson().isEmpty()) {
-                postProgress(callback, "Loading from local offline cache (0 tokens used)...");
+                postProgress(callback, "Loading your saved result...");
                 postSuccess(callback, cached.getResultJson(), TokenUsage.zero(), true);
                 return;
             }
@@ -114,9 +114,9 @@ public class GenerationManager {
             // 3. Check for chunking if materials are enormous (>100K tokens)
             List<String> chunks = TextChunker.chunkText(fullMaterials);
             if (chunks.size() > 1) {
-                postProgress(callback, String.format("Materials are large (%d chars). Processing in %d chunk(s) to stay under 100K token cap...", fullMaterials.length(), chunks.size()));
+                postProgress(callback, "Preparing a large set of materials. This may take a little longer...");
             } else {
-                postProgress(callback, "Preparing AI request with prompt caching...");
+                postProgress(callback, "Preparing your materials...");
             }
 
             // For single-chunk (standard cases up to ~75K tokens):
@@ -230,7 +230,7 @@ public class GenerationManager {
                         finalJson = runVerificationGapFiller(projectId, resultJson, langName);
                     }
 
-                    mainHandler.post(() -> callback.onProgress("Rendering styled PDF with iText 7..."));
+                    mainHandler.post(() -> callback.onProgress("Preparing your PDF..."));
 
                     try {
                         Project project = database.projectDao().getProjectByIdSync(projectId);
@@ -248,7 +248,8 @@ public class GenerationManager {
                                 ownerUid, projectId, projectName, language, detailLevel, finalJson, pdfFile);
                         mainHandler.post(() -> callback.onSuccess(pdfFile, usage, fromCache));
                     } catch (Exception e) {
-                        mainHandler.post(() -> callback.onError("Failed to render PDF: " + e.getMessage()));
+                        android.util.Log.e("GenerationManager", "PDF rendering failed", e);
+                        mainHandler.post(() -> callback.onError("Could not create the PDF. Please try again."));
                     }
                 });
             }
@@ -378,7 +379,7 @@ public class GenerationManager {
             @Override
             public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
                 executor.execute(() -> {
-                    mainHandler.post(() -> callback.onProgress("Rendering printable exam paper & solution key with iText 7..."));
+                    mainHandler.post(() -> callback.onProgress("Preparing your questions and answer key..."));
                     try {
                         com.example.examprep.data.model.exam.ExamQuiz quiz = com.example.examprep.data.model.exam.ExamQuiz.fromJson(resultJson);
                         for (com.example.examprep.data.model.exam.ExamQuestion question : quiz.getQuestions()) {
@@ -402,7 +403,8 @@ public class GenerationManager {
                                 ownerUid, projectId, projectName, language, resultJson, pdfFile);
                         mainHandler.post(() -> callback.onSuccess(quiz, pdfFile, usage, fromCache));
                     } catch (Exception e) {
-                        mainHandler.post(() -> callback.onError("Failed to render Exam PDF: " + e.getMessage()));
+                        android.util.Log.e("GenerationManager", "Exam rendering failed", e);
+                        mainHandler.post(() -> callback.onError("Could not create the questions and answer key. Please generate them again."));
                     }
                 });
             }
@@ -492,7 +494,7 @@ public class GenerationManager {
             @Override
             public void onSuccess(String resultJson, TokenUsage usage, boolean fromCache) {
                 executor.execute(() -> {
-                    mainHandler.post(() -> callback.onProgress("Building OpenXML Presentation (.pptx) file with custom Vintage Blue theme..."));
+                    mainHandler.post(() -> callback.onProgress("Preparing your presentation..."));
                     try {
                         com.example.examprep.data.cloud.RestoredPresentation.verifyJson(resultJson);
                         com.example.examprep.data.model.slide.PresentationDeck deck =
@@ -511,7 +513,8 @@ public class GenerationManager {
                                 ownerUid, projectId, projectName, language, resultJson, pptxFile);
                         mainHandler.post(() -> callback.onSuccess(deck, pptxFile, usage, fromCache));
                     } catch (Exception e) {
-                        mainHandler.post(() -> callback.onError("Failed to create PPTX: " + e.getMessage()));
+                        android.util.Log.e("GenerationManager", "Presentation rendering failed", e);
+                        mainHandler.post(() -> callback.onError("Could not create the presentation. Please try again."));
                     }
                 });
             }

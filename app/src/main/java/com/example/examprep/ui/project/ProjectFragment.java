@@ -595,9 +595,8 @@ public class ProjectFragment extends Fragment {
                     if (!progress.isShowing()) return;
                     progress.dismiss();
                     if (!task.isSuccessful()) {
-                        showRestoreError("Could not restore this backup. Check your connection and try again. "
-                                + (task.getException() != null && task.getException().getMessage() != null
-                                ? task.getException().getMessage() : ""));
+                        android.util.Log.w("ProjectFragment", "Content restoration failed", task.getException());
+                        showRestoreError("Could not restore this backup. Check your connection and try again.");
                         return;
                     }
                     File pdf = task.getResult();
@@ -833,7 +832,7 @@ public class ProjectFragment extends Fragment {
         LinearLayout resultsLayout = progressView.findViewById(R.id.layout_gen_results);
         TextView costBadge = progressView.findViewById(R.id.dialog_gen_cost_badge);
         TextView tokensText = progressView.findViewById(R.id.dialog_gen_tokens);
-        TextView jsonView = progressView.findViewById(R.id.dialog_gen_json);
+        TextView summaryView = progressView.findViewById(R.id.dialog_gen_summary);
 
         title.setText("Exam Practice Generation");
         status.setText("Reading source materials & generating exam questions...");
@@ -861,8 +860,8 @@ public class ProjectFragment extends Fragment {
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
-                    costBadge.setText("Local Cache: $0.00000 (Free)");
-                    tokensText.setText("0 network tokens used • Loaded from Room database cache");
+                    costBadge.setText("Saved result: no new charge");
+                    tokensText.setText("No new AI request was needed.");
                 } else {
                     costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
                     tokensText.setText(String.format("Tokens: %d in / %d out (Cache: %d read, %d write)",
@@ -870,7 +869,7 @@ public class ProjectFragment extends Fragment {
                             usage.getCacheReadInputTokens(), usage.getCacheCreationInputTokens()));
                 }
 
-                jsonView.setText("Questions Created: " + quiz.getQuestions().size()
+                summaryView.setText("Questions Created: " + quiz.getQuestions().size()
                         + "\nPrintable PDF: " + pdfFile.getName()
                         + " (" + (pdfFile.length() / 1024) + " KB)");
 
@@ -1082,7 +1081,7 @@ public class ProjectFragment extends Fragment {
         LinearLayout resultsLayout = progressView.findViewById(R.id.layout_gen_results);
         TextView costBadge = progressView.findViewById(R.id.dialog_gen_cost_badge);
         TextView tokensText = progressView.findViewById(R.id.dialog_gen_tokens);
-        TextView jsonView = progressView.findViewById(R.id.dialog_gen_json);
+        TextView summaryView = progressView.findViewById(R.id.dialog_gen_summary);
 
         title.setText("Study Guide PDF Generation");
         status.setText("Reading source materials...");
@@ -1110,8 +1109,8 @@ public class ProjectFragment extends Fragment {
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
-                    costBadge.setText("Local Cache: $0.00000 (Free)");
-                    tokensText.setText("0 network tokens used • Loaded from Room database cache");
+                    costBadge.setText("Saved result: no new charge");
+                    tokensText.setText("No new AI request was needed.");
                 } else {
                     costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
                     tokensText.setText(String.format("Tokens: %d in / %d out (Cache: %d read, %d write)",
@@ -1119,7 +1118,7 @@ public class ProjectFragment extends Fragment {
                             usage.getCacheReadInputTokens(), usage.getCacheCreationInputTokens()));
                 }
 
-                jsonView.setText("Saved PDF:\n" + pdfFile.getAbsolutePath() + "\nSize: " + (pdfFile.length() / 1024) + " KB");
+                summaryView.setText("Saved PDF:\n" + pdfFile.getName() + "\nSize: " + (pdfFile.length() / 1024) + " KB");
 
                 refreshLatestPdfCard();
 
@@ -1186,7 +1185,7 @@ public class ProjectFragment extends Fragment {
         LinearLayout resultsLayout = progressView.findViewById(R.id.layout_gen_results);
         TextView costBadge = progressView.findViewById(R.id.dialog_gen_cost_badge);
         TextView tokensText = progressView.findViewById(R.id.dialog_gen_tokens);
-        TextView jsonView = progressView.findViewById(R.id.dialog_gen_json);
+        TextView summaryView = progressView.findViewById(R.id.dialog_gen_summary);
 
         title.setText("Presentation Generation");
         status.setText("Reading source materials & generating slide outline...");
@@ -1214,8 +1213,8 @@ public class ProjectFragment extends Fragment {
                 resultsLayout.setVisibility(View.VISIBLE);
 
                 if (fromCache) {
-                    costBadge.setText("Local Cache: $0.00000 (Free)");
-                    tokensText.setText("0 network tokens used • Loaded from Room database cache");
+                    costBadge.setText("Saved result: no new charge");
+                    tokensText.setText("No new AI request was needed.");
                 } else {
                     costBadge.setText(String.format("Cost: $%.5f", usage.getCostUsd()));
                     tokensText.setText(String.format("Tokens: %d in / %d out (Cache: %d read, %d write)",
@@ -1223,7 +1222,7 @@ public class ProjectFragment extends Fragment {
                             usage.getCacheReadInputTokens(), usage.getCacheCreationInputTokens()));
                 }
 
-                jsonView.setText("Slides: " + deck.getSlides().size()
+                summaryView.setText("Slides: " + deck.getSlides().size()
                         + "\nFile: " + pptxFile.getName()
                         + " (" + (pptxFile.length() / 1024) + " KB)"
                         + "\nSpeaker Notes / Narration Script included");
@@ -1368,8 +1367,8 @@ public class ProjectFragment extends Fragment {
 
     private void showMissingApiKeyDialog() {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("ChatGPT API Key Required")
-                .setMessage("Please enter your ChatGPT / OpenAI API key in Settings to use AI features.")
+                .setTitle("API Key Required")
+                .setMessage("Please enter your API key in Settings to use AI features.")
                 .setPositiveButton("Open Settings", (d, w) -> {
                     startActivity(new Intent(requireContext(), SettingsActivity.class));
                 })

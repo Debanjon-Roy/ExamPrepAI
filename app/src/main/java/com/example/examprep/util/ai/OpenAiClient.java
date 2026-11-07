@@ -62,7 +62,7 @@ public class OpenAiClient implements AiProvider {
             @NonNull Callback callback
     ) {
         if (!securePrefs.hasApiKey()) {
-            postError(callback, "No ChatGPT / OpenAI API key configured. Please set your key in Settings.", null);
+            postError(callback, "No API key is configured. Please add your key in Settings.", null);
             return;
         }
 
@@ -73,20 +73,20 @@ public class OpenAiClient implements AiProvider {
             return;
         }
 
-        postProgress(callback, "Connecting to ChatGPT (GPT-4o mini)...");
+        postProgress(callback, "Preparing your content...");
 
         JsonObject requestBody = buildRequestBody(systemInstruction, materialsText, userPrompt);
 
         executeRequest(requestBody, new InternalCallback() {
             @Override
             public void onSuccess(String rawText, TokenUsage usage) {
-                postProgress(callback, "Validating structured JSON...");
+                postProgress(callback, "Checking the generated content...");
                 try {
                     String cleanJson = JsonCleaner.cleanAndValidateJson(rawText);
                     recordCost(usage);
                     postSuccess(callback, new AiResponse(cleanJson, usage, false));
                 } catch (JsonSyntaxException e) {
-                    postProgress(callback, "Malformed JSON received. Retrying with format correction...");
+                    postProgress(callback, "Refining the result. Please wait...");
                     retryWithCorrection(systemInstruction, materialsText, userPrompt, rawText, e.getMessage(), callback);
                 }
             }
@@ -120,7 +120,7 @@ public class OpenAiClient implements AiProvider {
                     postSuccess(callback, new AiResponse(cleanJson, usage, false));
                 } catch (JsonSyntaxException e) {
                     recordCost(usage);
-                    postError(callback, "ChatGPT failed to return valid JSON after retry: " + e.getMessage(), e);
+                    postError(callback, "The generated content could not be processed. Please try again.", e);
                 }
             }
 
@@ -138,7 +138,7 @@ public class OpenAiClient implements AiProvider {
             return;
         }
 
-        postProgress(callback, "Testing ChatGPT / OpenAI connection...");
+        postProgress(callback, "Checking the AI connection...");
 
         JsonObject payload = new JsonObject();
         payload.addProperty("model", MODEL);
@@ -156,7 +156,7 @@ public class OpenAiClient implements AiProvider {
 
         JsonObject userMsg = new JsonObject();
         userMsg.addProperty("role", "user");
-        userMsg.addProperty("content", "Return JSON: {\"status\":\"ok\",\"model\":\"gpt-4o-mini\"}");
+        userMsg.addProperty("content", "Return JSON: {\"status\":\"ok\"}");
         messages.add(userMsg);
 
         payload.add("messages", messages);
@@ -260,7 +260,7 @@ public class OpenAiClient implements AiProvider {
     private Call executeRequest(JsonObject payloadJson, InternalCallback callback) {
         String apiKey = securePrefs.getApiKey();
         if (apiKey == null || apiKey.isEmpty()) {
-            callback.onError("ChatGPT API key is missing. Please add it in Settings.", null);
+            callback.onError("Your API key is missing. Please add it in Settings.", null);
             return null;
         }
 
@@ -277,14 +277,14 @@ public class OpenAiClient implements AiProvider {
         call.enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                callback.onError("Network connection failure: " + e.getMessage(), e);
+                callback.onError("Could not connect. Check your internet connection and try again.", e);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     if (responseBody == null) {
-                        callback.onError("Received empty response from ChatGPT API", null);
+                        callback.onError("The AI service returned no content. Please try again.", null);
                         return;
                     }
 
@@ -315,7 +315,7 @@ public class OpenAiClient implements AiProvider {
 
                     callback.onSuccess(contentText, usage);
                 } catch (Exception e) {
-                    callback.onError("Failed to parse ChatGPT API response: " + e.getMessage(), e);
+                    callback.onError("The response could not be processed. Please try again.", e);
                 }
             }
         });
@@ -348,30 +348,29 @@ public class OpenAiClient implements AiProvider {
             if (json.has("error") && json.get("error").isJsonObject()) {
                 JsonObject err = json.getAsJsonObject("error");
                 String message = err.has("message") ? err.get("message").getAsString() : "";
-                String type = err.has("type") ? err.get("type").getAsString() : "";
                 String errorCode = err.has("code") && !err.get("code").isJsonNull() ? err.get("code").getAsString() : "";
 
                 switch (code) {
                     case 401:
-                        return "Invalid ChatGPT / OpenAI API Key. Please verify your key in Settings.";
+                        return "Your API key is invalid. Please verify it in Settings.";
                     case 429:
                         if (message.toLowerCase().contains("quota") || "insufficient_quota".equalsIgnoreCase(errorCode)) {
                             return "OpenAI account quota exceeded. Please check your OpenAI account billing / credits balance.";
                         }
-                        return "ChatGPT API rate limit reached. Please wait a moment and try again.";
+                        return "Too many requests. Please wait a moment and try again.";
                     case 500:
                     case 503:
-                        return "OpenAI servers temporarily overloaded. Please try again shortly.";
+                        return "The AI service is temporarily busy. Please try again shortly.";
                     default:
-                        if (!message.isEmpty()) {
-                            return message;
+                        if ("context_length_exceeded".equals(errorCode)) {
+                            return "There is too much material for one request. Try fewer or smaller files.";
                         }
-                        return type + (errorCode.isEmpty() ? "" : " (" + errorCode + ")");
+                        return "The AI service could not complete this request. Please try again.";
                 }
             }
         } catch (Exception ignored) {}
 
-        return "ChatGPT API Error (HTTP " + code + ")";
+        return "The AI service could not complete this request. Please try again.";
     }
 
     private void recordCost(TokenUsage usage) {

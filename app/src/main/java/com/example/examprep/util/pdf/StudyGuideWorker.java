@@ -93,7 +93,7 @@ public class StudyGuideWorker extends Worker {
             return Result.failure();
         }
 
-        updateProgressNotification("Analyzing materials with ChatGPT (GPT-4o mini)...", 30);
+        updateProgressNotification("Analyzing your materials...", 30);
 
         String langName = language.equals("bn") ? "Bengali (বাংলা)" : "English";
         String systemPrompt = "You are ExamForge. Create a complete, exhaustive study guide PDF outline covering every single topic found in the source materials. " +
@@ -152,7 +152,7 @@ public class StudyGuideWorker extends Worker {
         }
 
         // Render PDF with iText 7
-        updateProgressNotification("Rendering styled PDF with iText...", 85);
+        updateProgressNotification("Preparing your PDF...", 85);
         try {
             File pdfFile = StudyGuidePdfGenerator.generatePdf(
                     getApplicationContext(),
@@ -168,7 +168,8 @@ public class StudyGuideWorker extends Worker {
                     .putString(KEY_OUTPUT_PDF_PATH, pdfFile.getAbsolutePath())
                     .build());
         } catch (Exception e) {
-            return Result.failure(new Data.Builder().putString("error", "PDF generation failed: " + e.getMessage()).build());
+            android.util.Log.e("StudyGuideWorker", "PDF generation failed", e);
+            return Result.failure(new Data.Builder().putString("error", "Could not create the PDF. Please try again.").build());
         }
     }
 
