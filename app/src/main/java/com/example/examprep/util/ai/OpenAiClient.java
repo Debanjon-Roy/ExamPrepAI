@@ -33,7 +33,6 @@ import okhttp3.ResponseBody;
 public class OpenAiClient implements AiProvider {
 
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String MODEL = "gpt-4o-mini";
     private static final int MAX_TOKENS = 4096;
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
@@ -141,8 +140,7 @@ public class OpenAiClient implements AiProvider {
         postProgress(callback, "Checking the AI connection...");
 
         JsonObject payload = new JsonObject();
-        payload.addProperty("model", MODEL);
-        payload.addProperty("max_tokens", 60);
+        OpenAiModelConfig.apply(payload, 60);
 
         JsonObject responseFormat = new JsonObject();
         responseFormat.addProperty("type", "json_object");
@@ -182,8 +180,7 @@ public class OpenAiClient implements AiProvider {
 
     private JsonObject buildRequestBody(String systemInstruction, String materialsText, String userPrompt) {
         JsonObject payload = new JsonObject();
-        payload.addProperty("model", MODEL);
-        payload.addProperty("max_tokens", MAX_TOKENS);
+        OpenAiModelConfig.apply(payload, MAX_TOKENS);
         payload.addProperty("temperature", 0.2);
 
         // OpenAI JSON response format requires the word "json" to appear in the prompt
@@ -239,8 +236,7 @@ public class OpenAiClient implements AiProvider {
             return null;
         }
         JsonObject payload = new JsonObject();
-        payload.addProperty("model", MODEL);
-        payload.addProperty("max_tokens", MAX_TOKENS);
+        OpenAiModelConfig.apply(payload, MAX_TOKENS);
         payload.addProperty("temperature", 0.3);
         payload.addProperty("store", false);
         payload.add("messages", messages);

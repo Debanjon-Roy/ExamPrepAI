@@ -7,10 +7,7 @@ public class TokenUsage {
     private final long cacheReadInputTokens;
     private final double costUsd;
 
-    // OpenAI GPT-4o mini pricing per million tokens:
-    // Input: $0.15 per 1M tokens
-    // Output: $0.60 per 1M tokens
-    // Cached prompt input: $0.075 per 1M tokens
+    // GPT-6 Luna standard pricing per million tokens (new requests only).
     public TokenUsage(long inputTokens, long outputTokens,
                       long cacheCreationInputTokens, long cacheReadInputTokens) {
         this.inputTokens = inputTokens;
@@ -18,9 +15,14 @@ public class TokenUsage {
         this.cacheCreationInputTokens = cacheCreationInputTokens;
         this.cacheReadInputTokens = cacheReadInputTokens;
 
-        double rateInput = 0.15;
-        double rateOutput = 0.60;
-        double rateCachedInput = 0.075;
+        double rateInput = 0.10;
+        double rateOutput = 0.50;
+        double rateCachedInput = 0.01;
+        if (inputTokens > 272_000) {
+            rateInput *= 2;
+            rateCachedInput *= 2;
+            rateOutput *= 1.5;
+        }
 
         long uncachedInput = Math.max(0, inputTokens - cacheReadInputTokens);
         double cost = (uncachedInput * rateInput / 1_000_000.0)

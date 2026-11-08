@@ -76,7 +76,13 @@ public class PptxGenerator {
             int count = slides.size();
 
             // 1. [Content_Types].xml
-            writeZipEntry(zos, "[Content_Types].xml", buildContentTypesXml(count));
+            String contentTypes = buildContentTypesXml(count);
+            for (int i = 0; i < count; i++) {
+                if (slides.get(i).hasChart()) contentTypes = contentTypes.replace("</Types>",
+                        "<Override PartName=\"/ppt/charts/chart" + (i + 1)
+                                + ".xml\" ContentType=\"application/vnd.openxmlformats-officedocument.drawingml.chart+xml\"/></Types>");
+            }
+            writeZipEntry(zos, "[Content_Types].xml", contentTypes);
 
             // 2. _rels/.rels
             writeZipEntry(zos, "_rels/.rels", buildRootRelsXml());
@@ -105,7 +111,14 @@ public class PptxGenerator {
                 SlideOutline slide = slides.get(i);
 
                 writeZipEntry(zos, "ppt/slides/slide" + slideNum + ".xml", buildSlideXml(slide, slideNum, count, projectName));
-                writeZipEntry(zos, "ppt/slides/_rels/slide" + slideNum + ".xml.rels", buildSlideRelsXml(slideNum));
+                String slideRels = buildSlideRelsXml(slideNum);
+                if (slide.hasChart()) {
+                    slideRels = slideRels.replace("</Relationships>",
+                            "<Relationship Id=\"rIdChart\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart\" Target=\"../charts/chart"
+                                    + slideNum + ".xml\"/></Relationships>");
+                    writeZipEntry(zos, "ppt/charts/chart" + slideNum + ".xml", PptxChartXml.build(slide));
+                }
+                writeZipEntry(zos, "ppt/slides/_rels/slide" + slideNum + ".xml.rels", slideRels);
 
                 // Speaker notes
                 String notes = slide.getSpeakerNotes();
@@ -311,7 +324,7 @@ public class PptxGenerator {
                 "</Relationships>";
     }
 
-    private static String buildSlideXml(SlideOutline slide, int slideNum, int totalSlides, String projectName) {
+    static String buildSlideXml(SlideOutline slide, int slideNum, int totalSlides, String projectName) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
         sb.append("<p:sld xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">\n");
@@ -321,6 +334,7 @@ public class PptxGenerator {
         sb.append("      <p:grpSpPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"0\" cy=\"0\"/><a:chOff x=\"0\" y=\"0\"/><a:chExt cx=\"0\" cy=\"0\"/></a:xfrm></p:grpSpPr>\n");
 
         int shapeId = 2;
+        int animatedGraphicId = -1;
 
         if ("title".equalsIgnoreCase(slide.getLayout())) {
             // TITLE SLIDE: Dark Navy Hero Background
@@ -377,7 +391,7 @@ public class PptxGenerator {
 
             // Subheader
             if (slide.getSubheader() != null && !slide.getSubheader().isEmpty()) {
-                sb.append(buildTextShape(shapeId++, 800000, 1200000, 800000, 450000, slide.getSubheader(), 1500, false, COLOR_TEXT_MUTED, "l", "t"));
+                sb.append(buildTextShape(shapeId++, 800000, 1200000, 8000000, 450000, slide.getSubheader(), 1500, false, COLOR_TEXT_MUTED, "l", "t"));
             }
 
             // General Knowledge Badge (if applicable)
@@ -387,13 +401,29 @@ public class PptxGenerator {
             }
 
             // Has callout box on right side?
-            boolean hasCallout = (slide.getCalloutContent() != null && !slide.getCalloutContent().trim().isEmpty());
+            boolean hasVisual = slide.hasVisual();
+            boolean hasCallout = !hasVisual && (slide.getCalloutContent() != null && !slide.getCalloutContent().trim().isEmpty());
 
-            long bulletsWidth = hasCallout ? 6600000 : 10500000;
+            long bulletsWidth = hasVisual ? 5200000 : (hasCallout ? 6600000 : 10500000);
             long bulletsStartY = 1750000;
 
             // Bullets List
             sb.append(buildBulletsShape(shapeId++, 800000, bulletsStartY, bulletsWidth, 4300000, slide.getBulletPoints()));
+            if (hasVisual) {
+                animatedGraphicId = shapeId;
+                if (slide.hasChart()) {
+                    sb.append("<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id=\"").append(shapeId)
+                            .append("\" name=\"Data chart\"/><p:cNvGraphicFramePr/><p:nvPr/></p:nvGraphicFramePr>")
+                            .append("<p:xfrm><a:off x=\"6250000\" y=\"1750000\"/><a:ext cx=\"5300000\" cy=\"4250000\"/></p:xfrm>")
+                            .append("<a:graphic><a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\"><c:chart xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\" r:id=\"rIdChart\"/></a:graphicData></a:graphic></p:graphicFrame>");
+                } else {
+                    sb.append("<p:grpSp><p:nvGrpSpPr><p:cNvPr id=\"").append(shapeId)
+                            .append("\" name=\"Concept graphic\"/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>")
+                            .append("<p:grpSpPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"12192000\" cy=\"6858000\"/><a:chOff x=\"0\" y=\"0\"/><a:chExt cx=\"12192000\" cy=\"6858000\"/></a:xfrm></p:grpSpPr>")
+                            .append(buildVisual(slide, shapeId + 1)).append("</p:grpSp>");
+                }
+                shapeId += 80;
+            }
 
             // Callout Box on right
             if (hasCallout) {
@@ -422,6 +452,8 @@ public class PptxGenerator {
 
         sb.append("    </p:spTree>\n");
         sb.append("  </p:cSld>\n");
+        sb.append("<p:transition spd=\"med\" advClick=\"1\"><p:fade/></p:transition>");
+        if (animatedGraphicId > 0) sb.append(PptxAnimationXml.fadeIn(animatedGraphicId));
         sb.append("</p:sld>");
         return sb.toString();
     }
@@ -429,6 +461,36 @@ public class PptxGenerator {
     private static String buildFooter(int shapeId, int slideNum, int totalSlides, String projectName) {
         String footerText = projectName + " • ExamForge • Slide " + slideNum + " of " + totalSlides;
         return buildTextShape(shapeId, 800000, 6300000, 10592000, 350000, footerText, 1100, false, "8C9BAE", "r", "ctr");
+    }
+
+    /** Native DrawingML shapes remain editable and require no image downloads. */
+    private static String buildVisual(SlideOutline slide, int id) {
+        StringBuilder xml = new StringBuilder();
+        List<String> labels = slide.getVisualLabels();
+        int count = Math.min(labels.size(), 4);
+        boolean concept = "concept".equals(slide.getVisualType());
+        boolean process = "process".equals(slide.getVisualType());
+        boolean comparison = "comparison".equals(slide.getVisualType());
+        long x = 6500000, width = 4700000, top = 1800000;
+        for (int i = 0; i < count; i++) {
+            long y = comparison ? top + (i / 2) * 2100000 : top + i * 1050000;
+            long cardX = comparison ? x + (i % 2) * 2400000 : x;
+            long cardW = comparison ? 2250000 : width;
+            long cardH = comparison ? 1700000 : 760000;
+            long inset = concept && i > 0 ? 500000 : 0;
+            if (i > 0 && (process || concept)) {
+                long arrowX = x + (concept ? 650000 : width / 2 - 120000);
+                String arrow = buildFilledRectShape(id++, arrowX, y - 270000, 240000, 230000,
+                        COLOR_AMBER, null, 0).replace("prst=\"rect\"", "prst=\"downArrow\"");
+                xml.append(arrow);
+            }
+            xml.append(buildFilledRectShape(id++, cardX + inset, y, cardW - inset, cardH,
+                    i == 0 && concept ? COLOR_PRIMARY_BLUE : COLOR_CARD_BG, COLOR_PRIMARY_BLUE, 19050));
+            xml.append(buildTextShape(id++, cardX + inset + 120000, y + 60000,
+                    cardW - inset - 240000, cardH - 120000, labels.get(i), 1700, true,
+                    i == 0 && concept ? COLOR_WHITE : COLOR_TEXT_DARK, "ctr", "ctr"));
+        }
+        return xml.toString();
     }
 
     private static String buildFilledRectShape(

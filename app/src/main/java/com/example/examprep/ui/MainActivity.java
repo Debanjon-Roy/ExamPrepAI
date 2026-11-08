@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             int count = (projects != null) ? projects.size() : 0;
             if (textSidebarProjectCount != null) {
                 textSidebarProjectCount.setText(String.valueOf(count));
-            }
+             }
         });
 
         // 2. Home Dashboard Button in Sidebar

@@ -14,6 +14,37 @@ public class SlideOutline implements Serializable {
     private String calloutContent = "";
     private String speakerNotes = "";
     private boolean fromGeneralKnowledge = false;
+    private String visualType = "none";
+    private List<String> visualLabels = new ArrayList<>();
+    private List<Double> visualValues = new ArrayList<>();
+    private String visualTitle = "";
+    private String visualUnit = "";
+    public List<Double> getVisualValues() { return visualValues; }
+    public void setVisualValues(List<Double> values) { visualValues = values; }
+    public String getVisualTitle() { return visualTitle; }
+    public void setVisualTitle(String title) { visualTitle = title; }
+    public String getVisualUnit() { return visualUnit; }
+    public void setVisualUnit(String unit) { visualUnit = unit; }
+    public boolean hasChart() {
+        if (!("bar".equals(visualType) || "line".equals(visualType) || "pie".equals(visualType))
+                || visualLabels == null || visualValues == null || visualLabels.size() < 2
+                || visualLabels.size() != visualValues.size() || visualLabels.size() > 8) return false;
+        double sum = 0;
+        for (Double value : visualValues) {
+            if (value == null || !Double.isFinite(value) || ("pie".equals(visualType) && value < 0)) return false;
+            sum += value;
+        }
+        return !"pie".equals(visualType) || (Double.isFinite(sum) && sum > 0);
+    }
+
+    public String getVisualType() { return visualType; }
+    public void setVisualType(String type) { visualType = type; }
+    public List<String> getVisualLabels() { return visualLabels; }
+    public void setVisualLabels(List<String> labels) { visualLabels = labels; }
+    public boolean hasVisual() {
+        return hasChart() || ("process".equals(visualType) || "concept".equals(visualType)
+                || "comparison".equals(visualType)) && visualLabels != null && visualLabels.size() >= 2;
+    }
 
     public SlideOutline() {}
 

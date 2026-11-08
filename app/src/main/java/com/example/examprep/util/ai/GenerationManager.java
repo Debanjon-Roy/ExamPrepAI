@@ -99,7 +99,7 @@ public class GenerationManager {
             }
 
             // 2. Check local Room cache
-            String cacheKeyData = fullMaterials + "\n" + generationType + "\n" + systemInstruction + "\n" + userPrompt + "\n" + project.getLanguage();
+            String cacheKeyData = OpenAiModelConfig.MODEL + "\n" + fullMaterials + "\n" + generationType + "\n" + systemInstruction + "\n" + userPrompt + "\n" + project.getLanguage();
             String inputHash = HashUtils.sha256(cacheKeyData);
 
             GenerationCacheDao cacheDao = database.generationCacheDao();
@@ -418,6 +418,15 @@ public class GenerationManager {
                 "Language must be " + langName + ". Target slide count: approximately " + targetSlideCount + " slides. " +
                 "Ground all facts strictly in the materials. If any background knowledge is added, set \"from_general_knowledge\": true on that slide. " +
                 "IMPORTANT: For every slide, provide a comprehensive, engaging 'speaker_notes' script (at least 2-4 sentences explaining the slide like a university professor would during a lecture). This will be used for narration audio. " +
+                "Include meaningful editable graphics on at least half of content slides. Add an optional visual object: " +
+                "\"visual\":{\"type\":\"process|concept|comparison|bar|line|pie\",\"title\":\"What the graphic explains\",\"unit\":\"Source unit\",\"labels\":[\"Short label\",\"Short label\"],\"values\":[12,24]}. " +
+                "Prefer actual charts over text boxes when the source provides numerical data: bar for comparing quantities, line for ordered trends, pie only for nonnegative parts of a whole. " +
+                "Charts require 2-8 labels and exactly one finite numeric value per label. Copy quantities and units faithfully from the source. " +
+                "Never fabricate chart values or imply that unrelated categories form a trend. If suitable data is absent, use a concept, comparison or process diagram. " +
+                "Do not add values to non-chart diagrams. PPTX applies subtle fade transitions and a graphic entrance animation automatically. " +
+                "Use process for 2-4 ordered steps, concept for a central idea followed by 1-3 related ideas, and comparison for 2-4 contrasting concepts. " +
+                "Use source-grounded labels of at most 8 words each. Never invent data, relationships or image URLs. " +
+                "On visual slides keep bullet_points to 2-3 short supporting points; explain details in speaker_notes. Omit visual when no meaningful graphic fits. " +
                 "Output strictly JSON with this schema: " +
                 "{\"presentation_title\":\"Title of Deck\",\"subtitle\":\"Core Review\",\"language\":\"" + language + "\",\"total_slides\":" + targetSlideCount + "," +
                 "\"slides\":[" +

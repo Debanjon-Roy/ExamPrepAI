@@ -48,6 +48,38 @@ public class PresentationDeck implements Serializable {
                         slide.setLayout(obj.has("layout") ? obj.get("layout").getAsString() : "content");
                         slide.setHeader(obj.has("header") ? obj.get("header").getAsString() : (obj.has("title") ? obj.get("title").getAsString() : "Slide " + index));
                         slide.setSubheader(obj.has("subheader") ? obj.get("subheader").getAsString() : "");
+                        if (obj.has("visual") && obj.get("visual").isJsonObject()) {
+                            JsonObject visual = obj.getAsJsonObject("visual");
+                            if (visual.has("type") && visual.get("type").isJsonPrimitive()) {
+                                slide.setVisualType(visual.get("type").getAsString());
+                            }
+                            List<String> labels = new ArrayList<>();
+                            if (visual.has("labels") && visual.get("labels").isJsonArray()) {
+                                for (JsonElement label : visual.getAsJsonArray("labels")) {
+                                    if (label.isJsonPrimitive() && label.getAsJsonPrimitive().isString()
+                                            && !label.getAsString().trim().isEmpty() && labels.size() < 8) {
+                                        labels.add(label.getAsString().trim());
+                                    }
+                                }
+                            }
+                            slide.setVisualLabels(labels);
+                            List<Double> values = new ArrayList<>();
+                            if (visual.has("values") && visual.get("values").isJsonArray()) {
+                                for (JsonElement value : visual.getAsJsonArray("values")) {
+                                    if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
+                                        values.add(value.getAsDouble());
+                                    } else {
+                                        values.clear();
+                                        break;
+                                    }
+                                }
+                            }
+                            slide.setVisualValues(values);
+                            if (visual.has("title") && visual.get("title").isJsonPrimitive())
+                                slide.setVisualTitle(visual.get("title").getAsString());
+                            if (visual.has("unit") && visual.get("unit").isJsonPrimitive())
+                                slide.setVisualUnit(visual.get("unit").getAsString());
+                        }
 
                         if (obj.has("bullet_points") && obj.get("bullet_points").isJsonArray()) {
                             List<String> bullets = new ArrayList<>();
