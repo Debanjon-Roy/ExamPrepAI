@@ -383,7 +383,7 @@ public class PptxGenerator {
             // General Knowledge Badge (if applicable)
             if (slide.isFromGeneralKnowledge()) {
                 sb.append(buildFilledRectShape(shapeId++, 9000000, 500000, 2400000, 450000, COLOR_AMBER_LIGHT, COLOR_AMBER, 12700));
-                sb.append(buildTextShape(shapeId++, 9000000, 500000, 2400000, 450000, "✦ General Knowledge Note", 1100, true, COLOR_AMBER, "ctr", "ctr"));
+                sb.append(buildTextShape(shapeId++, 9000000, 500000, 2400000, 450000, "General Knowledge Note", 1100, true, COLOR_AMBER, "ctr", "ctr"));
             }
 
             // Has callout box on right side?

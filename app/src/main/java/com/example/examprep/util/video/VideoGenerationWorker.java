@@ -366,7 +366,7 @@ public class VideoGenerationWorker extends Worker {
         long sizeMb = videoFile.length() / (1024 * 1024);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setContentTitle("🎬 Narrated Video Ready!")
+                .setContentTitle("Narrated Video Ready!")
                 .setContentText(projectName + " • " + sizeMb + " MB MP4 Video Produced")
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setAutoCancel(true)

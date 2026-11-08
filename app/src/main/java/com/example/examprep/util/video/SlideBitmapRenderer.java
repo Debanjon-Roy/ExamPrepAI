@@ -234,7 +234,7 @@ public class SlideBitmapRenderer {
             paint.setTextSize(13f);
             paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("✦ General Knowledge Note", 1045, 73, paint);
+            canvas.drawText("General Knowledge Note", 1045, 73, paint);
         }
 
         boolean hasCallout = (slide.getCalloutContent() != null && !slide.getCalloutContent().trim().isEmpty());

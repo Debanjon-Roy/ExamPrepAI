@@ -71,9 +71,9 @@
     <!-- Welcome / Auth -->
     <string name="welcome_title">Welcome to ExamForge</string>
     <string name="welcome_tagline">Turn your notes into study guides, slides, quizzes and videos.</string>
-    <string name="welcome_feature_1">📄  Upload PDFs, slides, spreadsheets or photos</string>
-    <string name="welcome_feature_2">🧠  Generate study guides and exam questions with AI</string>
-    <string name="welcome_feature_3">🎬  Create slide decks and revision videos</string>
+    <string name="welcome_feature_1">Upload PDFs, slides, spreadsheets or photos</string>
+    <string name="welcome_feature_2">Generate study guides and exam questions with AI</string>
+    <string name="welcome_feature_3">Create slide decks and revision videos</string>
     <string name="login_with_google">Continue with Google</string>
     <string name="login_footer">Sign in with your Google account to get started.</string>
     <string name="login_error_generic">Sign-in failed. Please check your connection and try again.</string>

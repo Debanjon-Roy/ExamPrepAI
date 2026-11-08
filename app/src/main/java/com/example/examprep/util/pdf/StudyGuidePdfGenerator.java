@@ -275,7 +275,7 @@ public class StudyGuidePdfGenerator {
                                     .setMarginTop(4)
                                     .setMarginBottom(8);
 
-                            noteBox.add(new Paragraph("★ Exam Tips & Pitfalls")
+                            noteBox.add(new Paragraph("Exam Tips & Pitfalls")
                                     .setFontSize(10.5f)
                                     .setFont(fontBold)
                                     .setFontColor(COLOR_ACCENT)
@@ -317,7 +317,7 @@ public class StudyGuidePdfGenerator {
                     .setPadding(10)
                     .setMarginTop(18);
 
-            certBox.add(new Paragraph("✓ ExamForge Verification Complete")
+            certBox.add(new Paragraph("ExamForge Verification Complete")
                     .setFontSize(10.5f)
                     .setFont(fontBold)
                     .setFontColor(COLOR_PRIMARY));

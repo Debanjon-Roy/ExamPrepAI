@@ -235,7 +235,7 @@ public class ExamPdfGenerator {
                         .setFontColor(COLOR_PRIMARY)
                         .setMarginBottom(3));
 
-                expBox.add(new Paragraph("✓ Correct Answer: " + q.getCorrectAnswer())
+                expBox.add(new Paragraph("Correct Answer: " + q.getCorrectAnswer())
                         .setFontSize(9.5f)
                         .setFont(fontBold)
                         .setFontColor(COLOR_ACCENT)

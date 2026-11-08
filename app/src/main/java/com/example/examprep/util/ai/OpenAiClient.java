@@ -191,7 +191,7 @@ public class OpenAiClient implements AiProvider {
         responseFormat.addProperty("type", "json_object");
         payload.add("response_format", responseFormat);
 
-        String effectiveSystem = systemInstruction;
+        String effectiveSystem = systemInstruction + " Do not use emojis in generated content.";
         if (!effectiveSystem.toLowerCase().contains("json")) {
             effectiveSystem = effectiveSystem + " You must output valid JSON.";
         }
